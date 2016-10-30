@@ -26,15 +26,16 @@ import com.keepassdroid.UpdateStatus;
 import com.keepassdroid.database.PwDatabase;
 import com.keepassdroid.database.exception.InvalidDBException;
 
-public abstract class Importer {
+public abstract class Importer
+{
 
-	public static final boolean DEBUG = true;
+    public static final boolean DEBUG = true;
 
-	public abstract PwDatabase openDatabase( InputStream inStream, String password, InputStream keyInputStream)
-		throws IOException, InvalidDBException;
+    public abstract PwDatabase openDatabase(InputStream inStream, String password, InputStream keyInputStream)
+            throws IOException, InvalidDBException;
 
-	public abstract PwDatabase openDatabase( InputStream inStream, String password, InputStream keyInputStream, UpdateStatus status )
-		throws IOException, InvalidDBException;
+    public abstract PwDatabase openDatabase(InputStream inStream, String password, InputStream keyInputStream, UpdateStatus status)
+            throws IOException, InvalidDBException;
 
 
 }

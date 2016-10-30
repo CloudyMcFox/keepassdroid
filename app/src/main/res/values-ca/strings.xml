@@ -31,7 +31,7 @@
     <string name="add_group_title">Afegeix grup</string>
     <string name="algorithm">Algoritme</string>
     <string name="algorithm_colon">Algoritme:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Temps d\'espera de l\'aplicació</string>
     <string name="app_timeout_summary">Temps abans de bloquejar la base de dades quan l\'applicació està inactiva.</string>
     <string name="application">Aplicació</string>

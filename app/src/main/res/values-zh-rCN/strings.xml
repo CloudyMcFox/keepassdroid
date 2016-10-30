@@ -28,7 +28,7 @@
     <string name="add_group_title">添加群</string>
     <string name="algorithm">算法</string>
     <string name="algorithm_colon">算法：</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">应用程序超时</string>
     <string name="app_timeout_summary">应用程序处于非活动时锁定数据库。</string>
     <string name="application">应用程序</string>

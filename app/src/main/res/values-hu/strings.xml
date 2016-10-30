@@ -10,7 +10,7 @@
     <string name="add_group_title">Csoport hozzáadása</string>
     <string name="algorithm">Algoritmus</string>
     <string name="algorithm_colon">Algoritmus:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Alkalmazás időkorlátja</string>
     <string name="app_timeout_summary">Beállíthatja, mennyi idő után kerüljön lezárásra az adatbázis</string>
     <string name="application">Alkalmazás</string>

@@ -31,7 +31,7 @@
     <string name="add_string">Adicionar linha</string>
     <string name="algorithm">Algoritmo</string>
     <string name="algorithm_colon">Algoritmo:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Tempo de espera da aplicação</string>
     <string name="app_timeout_summary">Tempo antes do bloqueio da base de dados quando a aplicação está inativa.</string>
     <string name="application">Aplicação</string>

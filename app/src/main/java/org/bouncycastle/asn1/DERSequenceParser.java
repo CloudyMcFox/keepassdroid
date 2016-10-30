@@ -3,7 +3,7 @@ package org.bouncycastle.asn1;
 import java.io.IOException;
 
 public class DERSequenceParser
-    implements ASN1SequenceParser
+        implements ASN1SequenceParser
 {
     private ASN1StreamParser _parser;
 
@@ -13,19 +13,16 @@ public class DERSequenceParser
     }
 
     public DEREncodable readObject()
-        throws IOException
+            throws IOException
     {
         return _parser.readObject();
     }
 
     public DERObject getDERObject()
     {
-        try
-        {
+        try {
             return new DERSequence(_parser.readVector());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new IllegalStateException(e.getMessage());
         }
     }

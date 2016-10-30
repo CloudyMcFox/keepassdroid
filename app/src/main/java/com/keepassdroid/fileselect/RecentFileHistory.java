@@ -34,7 +34,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
-public class RecentFileHistory {
+public class RecentFileHistory
+{
 
     private static String DB_KEY = "recent_databases";
     private static String KEYFILE_KEY = "recent_keyfiles";
@@ -47,16 +48,19 @@ public class RecentFileHistory {
     private boolean enabled;
     private boolean init = false;
 
-    public RecentFileHistory(Context c) {
+    public RecentFileHistory(Context c)
+    {
         ctx = c.getApplicationContext();
 
         prefs = PreferenceManager.getDefaultSharedPreferences(c);
         enabled = prefs.getBoolean(ctx.getString(R.string.recentfile_key), ctx.getResources().getBoolean(R.bool.recentfile_default));
-        listner = new OnSharedPreferenceChangeListener() {
+        listner = new OnSharedPreferenceChangeListener()
+        {
 
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                    String key) {
+                                                  String key)
+            {
                 if (key.equals(ctx.getString(R.string.recentfile_key))) {
                     enabled = sharedPreferences.getBoolean(ctx.getString(R.string.recentfile_key), ctx.getResources().getBoolean(R.bool.recentfile_default));
                 }
@@ -65,7 +69,8 @@ public class RecentFileHistory {
         prefs.registerOnSharedPreferenceChangeListener(listner);
     }
 
-    private synchronized void init() {
+    private synchronized void init()
+    {
         if (!init) {
             if (!upgradeFromSQL()) {
                 loadPrefs();
@@ -75,7 +80,8 @@ public class RecentFileHistory {
         }
     }
 
-    private boolean upgradeFromSQL() {
+    private boolean upgradeFromSQL()
+    {
 
         try {
             // Check for a database to upgrade from
@@ -93,7 +99,7 @@ public class RecentFileHistory {
             int dbIndex = cursor.getColumnIndex(FileDbHelper.KEY_FILE_FILENAME);
             int keyIndex = cursor.getColumnIndex(FileDbHelper.KEY_FILE_KEYFILE);
 
-            if(cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 while (cursor.moveToNext()) {
                     String filename = cursor.getString(dbIndex);
                     String keyfile = cursor.getString(keyIndex);
@@ -121,12 +127,14 @@ public class RecentFileHistory {
         return true;
     }
 
-    private boolean sqlDatabaseExists() {
+    private boolean sqlDatabaseExists()
+    {
         File db = ctx.getDatabasePath(FileDbHelper.DATABASE_NAME);
         return db.exists();
     }
 
-    public void createFile(Uri uri, Uri keyUri) {
+    public void createFile(Uri uri, Uri keyUri)
+    {
         if (!enabled || uri == null) return;
 
         init();
@@ -143,7 +151,8 @@ public class RecentFileHistory {
         savePrefs();
     }
 
-    public boolean hasRecentFiles() {
+    public boolean hasRecentFiles()
+    {
         if (!enabled) return false;
 
         init();
@@ -151,27 +160,32 @@ public class RecentFileHistory {
         return databases.size() > 0;
     }
 
-    public String getDatabaseAt(int i) {
+    public String getDatabaseAt(int i)
+    {
         init();
         return databases.get(i);
     }
 
-    public String getKeyfileAt(int i) {
+    public String getKeyfileAt(int i)
+    {
         init();
         return keyfiles.get(i);
     }
 
-    private void loadPrefs() {
+    private void loadPrefs()
+    {
         loadList(databases, DB_KEY);
         loadList(keyfiles, KEYFILE_KEY);
     }
 
-    private void savePrefs() {
+    private void savePrefs()
+    {
         saveList(DB_KEY, databases);
         saveList(KEYFILE_KEY, keyfiles);
     }
 
-    private void loadList(List<String> list, String keyprefix) {
+    private void loadList(List<String> list, String keyprefix)
+    {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         int size = prefs.getInt(keyprefix, 0);
 
@@ -181,7 +195,8 @@ public class RecentFileHistory {
         }
     }
 
-    private void saveList(String keyprefix, List<String> list) {
+    private void saveList(String keyprefix, List<String> list)
+    {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         SharedPreferences.Editor edit = prefs.edit();
         int size = list.size();
@@ -193,11 +208,13 @@ public class RecentFileHistory {
         EditorCompat.apply(edit);
     }
 
-    public void deleteFile(Uri uri) {
+    public void deleteFile(Uri uri)
+    {
         deleteFile(uri, true);
     }
 
-    public void deleteFile(Uri uri, boolean save) {
+    public void deleteFile(Uri uri, boolean save)
+    {
         init();
 
         String uriName = uri.toString();
@@ -217,20 +234,22 @@ public class RecentFileHistory {
         }
     }
 
-    public List<String> getDbList() {
+    public List<String> getDbList()
+    {
         init();
 
         return databases;
     }
 
-    public Uri getFileByName(Uri database) {
+    public Uri getFileByName(Uri database)
+    {
         if (!enabled) return null;
 
         init();
 
         int size = databases.size();
         for (int i = 0; i < size; i++) {
-            if (UriUtil.equalsDefaultfile(database,databases.get(i))) {
+            if (UriUtil.equalsDefaultfile(database, databases.get(i))) {
                 return UriUtil.parseDefaultFile(keyfiles.get(i));
             }
         }
@@ -238,7 +257,8 @@ public class RecentFileHistory {
         return null;
     }
 
-    public void deleteAll() {
+    public void deleteAll()
+    {
         init();
 
         databases.clear();
@@ -247,7 +267,8 @@ public class RecentFileHistory {
         savePrefs();
     }
 
-    public void deleteAllKeys() {
+    public void deleteAllKeys()
+    {
         init();
 
         keyfiles.clear();
@@ -260,7 +281,8 @@ public class RecentFileHistory {
         savePrefs();
     }
 
-    private void trimLists() {
+    private void trimLists()
+    {
         int size = databases.size();
         for (int i = FileDbHelper.MAX_FILES; i < size; i++) {
             databases.remove(i);

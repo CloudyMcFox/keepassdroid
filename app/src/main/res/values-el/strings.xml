@@ -28,7 +28,7 @@
     <string name="add_group_title">Προσθήκη Ομάδας</string>
     <string name="algorithm">Αλγόριθμος</string>
     <string name="algorithm_colon">Αλγόριθμος:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Χρονικό όριο εφαρμογής</string>
     <string name="app_timeout_summary">Ο χρόνος προτού κλειδωθεί η βάση δεδομένων όταν η εφαρμογή είναι ανενεργή.</string>
     <string name="application">Εφαρμογή</string>

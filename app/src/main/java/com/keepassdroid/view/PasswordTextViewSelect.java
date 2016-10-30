@@ -25,39 +25,46 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 
-public class PasswordTextViewSelect extends TextViewSelect {
+public class PasswordTextViewSelect extends TextViewSelect
+{
 
-	public PasswordTextViewSelect(Context context, AttributeSet attrs,
-			int defStyle) {
-		super(context, attrs, defStyle);
-	}
+    public PasswordTextViewSelect(Context context, AttributeSet attrs,
+                                  int defStyle)
+    {
+        super(context, attrs, defStyle);
+    }
 
-	public PasswordTextViewSelect(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    public PasswordTextViewSelect(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+    }
 
-	public PasswordTextViewSelect(Context context) {
-		super(context);
-	}
+    public PasswordTextViewSelect(Context context)
+    {
+        super(context);
+    }
 
-	private Typeface getTypeface(Typeface tf) {
-		Typeface tfOverride = TypefaceFactory.getTypeface(getContext(), "fonts/DejaVuSansMono.ttf");
-		
-		if (tfOverride != null) {
-			return tfOverride;
-		}
-		
-		return tf;
-	}
+    private Typeface getTypeface(Typeface tf)
+    {
+        Typeface tfOverride = TypefaceFactory.getTypeface(getContext(), "fonts/DejaVuSansMono.ttf");
 
-	@Override
-	public void setTypeface(Typeface tf, int style) {
-		super.setTypeface(getTypeface(tf), style);
-	}
+        if (tfOverride != null) {
+            return tfOverride;
+        }
 
-	@Override
-	public void setTypeface(Typeface tf) {
-		super.setTypeface(getTypeface(tf));
-	}
+        return tf;
+    }
+
+    @Override
+    public void setTypeface(Typeface tf, int style)
+    {
+        super.setTypeface(getTypeface(tf), style);
+    }
+
+    @Override
+    public void setTypeface(Typeface tf)
+    {
+        super.setTypeface(getTypeface(tf));
+    }
 
 }

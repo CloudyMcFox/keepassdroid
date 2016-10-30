@@ -8,7 +8,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * A padder that adds NULL byte padding to a block.
  */
 public class ZeroBytePadding
-    implements BlockCipherPadding
+        implements BlockCipherPadding
 {
     /**
      * Initialise the padder.
@@ -16,7 +16,7 @@ public class ZeroBytePadding
      * @param random - a SecureRandom if available.
      */
     public void init(SecureRandom random)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         // nothing to do.
     }
@@ -36,13 +36,12 @@ public class ZeroBytePadding
      * number of bytes added.
      */
     public int addPadding(
-        byte[]  in,
-        int     inOff)
+            byte[] in,
+            int inOff)
     {
         int added = (in.length - inOff);
 
-        while (inOff < in.length)
-        {
+        while (inOff < in.length) {
             in[inOff] = (byte) 0;
             inOff++;
         }
@@ -54,14 +53,12 @@ public class ZeroBytePadding
      * return the number of pad bytes present in the block.
      */
     public int padCount(byte[] in)
-        throws InvalidCipherTextException
+            throws InvalidCipherTextException
     {
         int count = in.length;
 
-        while (count > 0)
-        {
-            if (in[count - 1] != 0)
-            {
+        while (count > 0) {
+            if (in[count - 1] != 0) {
                 break;
             }
 

@@ -16,83 +16,75 @@ import org.bouncycastle.asn1.DERTaggedObject;
  */
 @SuppressWarnings("unchecked")
 public class SignedData
-    extends ASN1Encodable
-    implements PKCSObjectIdentifiers
+        extends ASN1Encodable
+        implements PKCSObjectIdentifiers
 {
-    private DERInteger              version;
-    private ASN1Set                 digestAlgorithms;
-    private ContentInfo             contentInfo;
-    private ASN1Set                 certificates;
-    private ASN1Set                 crls;
-    private ASN1Set                 signerInfos;
+    private DERInteger version;
+    private ASN1Set digestAlgorithms;
+    private ContentInfo contentInfo;
+    private ASN1Set certificates;
+    private ASN1Set crls;
+    private ASN1Set signerInfos;
 
     public static SignedData getInstance(
-        Object  o)
+            Object o)
     {
-        if (o instanceof SignedData)
-        {
-            return (SignedData)o;
-        }
-        else if (o instanceof ASN1Sequence)
-        {
-            return new SignedData((ASN1Sequence)o);
+        if (o instanceof SignedData) {
+            return (SignedData) o;
+        } else if (o instanceof ASN1Sequence) {
+            return new SignedData((ASN1Sequence) o);
         }
 
         throw new IllegalArgumentException("unknown object in factory: " + o);
     }
 
     public SignedData(
-        DERInteger        _version,
-        ASN1Set           _digestAlgorithms,
-        ContentInfo       _contentInfo,
-        ASN1Set           _certificates,
-        ASN1Set           _crls,
-        ASN1Set           _signerInfos)
+            DERInteger _version,
+            ASN1Set _digestAlgorithms,
+            ContentInfo _contentInfo,
+            ASN1Set _certificates,
+            ASN1Set _crls,
+            ASN1Set _signerInfos)
     {
-        version          = _version;
+        version = _version;
         digestAlgorithms = _digestAlgorithms;
-        contentInfo      = _contentInfo;
-        certificates     = _certificates;
-        crls             = _crls;
-        signerInfos      = _signerInfos;
+        contentInfo = _contentInfo;
+        certificates = _certificates;
+        crls = _crls;
+        signerInfos = _signerInfos;
     }
 
     public SignedData(
-        ASN1Sequence seq)
+            ASN1Sequence seq)
     {
-        Enumeration     e = seq.getObjects();
+        Enumeration e = seq.getObjects();
 
-        version = (DERInteger)e.nextElement();
-        digestAlgorithms = ((ASN1Set)e.nextElement());
+        version = (DERInteger) e.nextElement();
+        digestAlgorithms = ((ASN1Set) e.nextElement());
         contentInfo = ContentInfo.getInstance(e.nextElement());
 
-        while (e.hasMoreElements())
-        {
-            DERObject o = (DERObject)e.nextElement();
+        while (e.hasMoreElements()) {
+            DERObject o = (DERObject) e.nextElement();
 
             //
             // an interesting feature of SignedData is that there appear to be varying implementations...
             // for the moment we ignore anything which doesn't fit.
             //
-            if (o instanceof DERTaggedObject)
-            {
-                DERTaggedObject tagged = (DERTaggedObject)o;
+            if (o instanceof DERTaggedObject) {
+                DERTaggedObject tagged = (DERTaggedObject) o;
 
-                switch (tagged.getTagNo())
-                {
-                case 0:
-                    certificates = ASN1Set.getInstance(tagged, false);
-                    break;
-                case 1:
-                    crls = ASN1Set.getInstance(tagged, false);
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown tag value " + tagged.getTagNo());
+                switch (tagged.getTagNo()) {
+                    case 0:
+                        certificates = ASN1Set.getInstance(tagged, false);
+                        break;
+                    case 1:
+                        crls = ASN1Set.getInstance(tagged, false);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("unknown tag value " + tagged.getTagNo());
                 }
-            }
-            else
-            {
-                signerInfos = (ASN1Set)o;
+            } else {
+                signerInfos = (ASN1Set) o;
             }
         }
     }
@@ -150,13 +142,11 @@ public class SignedData
         v.add(digestAlgorithms);
         v.add(contentInfo);
 
-        if (certificates != null)
-        {
+        if (certificates != null) {
             v.add(new DERTaggedObject(false, 0, certificates));
         }
 
-        if (crls != null)
-        {
+        if (crls != null) {
             v.add(new DERTaggedObject(false, 1, crls));
         }
 

@@ -4,12 +4,12 @@ import org.bouncycastle.util.Arrays;
 
 public class DHValidationParameters
 {
-    private byte[]  seed;
-    private int     counter;
+    private byte[] seed;
+    private int counter;
 
     public DHValidationParameters(
-        byte[]  seed,
-        int     counter)
+            byte[] seed,
+            int counter)
     {
         this.seed = seed;
         this.counter = counter;
@@ -26,17 +26,15 @@ public class DHValidationParameters
     }
 
     public boolean equals(
-        Object o)
+            Object o)
     {
-        if (!(o instanceof DHValidationParameters))
-        {
+        if (!(o instanceof DHValidationParameters)) {
             return false;
         }
 
-        DHValidationParameters  other = (DHValidationParameters)o;
+        DHValidationParameters other = (DHValidationParameters) o;
 
-        if (other.counter != this.counter)
-        {
+        if (other.counter != this.counter) {
             return false;
         }
 

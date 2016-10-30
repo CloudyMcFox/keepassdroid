@@ -19,9 +19,10 @@
  */
 package com.keepassdroid.database;
 
-public class PwDefsV4 {
+public class PwDefsV4
+{
 
-	public static final String TITLE_FIELD = "Title";
+    public static final String TITLE_FIELD = "Title";
 
     public static final String USERNAME_FIELD = "UserName";
 

@@ -6,32 +6,29 @@ import java.io.IOException;
  * DER PrintableString object.
  */
 public class DERPrintableString
-    extends ASN1Object
-    implements DERString
+        extends ASN1Object
+        implements DERString
 {
-    String  string;
+    String string;
 
     /**
      * return a printable string from the passed in object.
-     * 
-     * @exception IllegalArgumentException if the object cannot be converted.
+     *
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static DERPrintableString getInstance(
-        Object  obj)
+            Object obj)
     {
-        if (obj == null || obj instanceof DERPrintableString)
-        {
-            return (DERPrintableString)obj;
+        if (obj == null || obj instanceof DERPrintableString) {
+            return (DERPrintableString) obj;
         }
 
-        if (obj instanceof ASN1OctetString)
-        {
-            return new DERPrintableString(((ASN1OctetString)obj).getOctets());
+        if (obj instanceof ASN1OctetString) {
+            return new DERPrintableString(((ASN1OctetString) obj).getOctets());
         }
 
-        if (obj instanceof ASN1TaggedObject)
-        {
-            return getInstance(((ASN1TaggedObject)obj).getObject());
+        if (obj instanceof ASN1TaggedObject) {
+            return getInstance(((ASN1TaggedObject) obj).getObject());
         }
 
         throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
@@ -40,15 +37,15 @@ public class DERPrintableString
     /**
      * return a Printable String from a tagged object.
      *
-     * @param obj the tagged object holding the object we want
+     * @param obj      the tagged object holding the object we want
      * @param explicit true if the object is meant to be explicitly
-     *              tagged false otherwise.
-     * @exception IllegalArgumentException if the tagged object cannot
-     *               be converted.
+     *                 tagged false otherwise.
+     * @throws IllegalArgumentException if the tagged object cannot
+     *                                  be converted.
      */
     public static DERPrintableString getInstance(
-        ASN1TaggedObject obj,
-        boolean          explicit)
+            ASN1TaggedObject obj,
+            boolean explicit)
     {
         return getInstance(obj.getObject());
     }
@@ -57,13 +54,12 @@ public class DERPrintableString
      * basic constructor - byte encoded string.
      */
     public DERPrintableString(
-        byte[]   string)
+            byte[] string)
     {
-        char[]  cs = new char[string.length];
+        char[] cs = new char[string.length];
 
-        for (int i = 0; i != cs.length; i++)
-        {
-            cs[i] = (char)(string[i] & 0xff);
+        for (int i = 0; i != cs.length; i++) {
+            cs[i] = (char) (string[i] & 0xff);
         }
 
         this.string = new String(cs);
@@ -73,7 +69,7 @@ public class DERPrintableString
      * basic constructor - this does not validate the string
      */
     public DERPrintableString(
-        String   string)
+            String string)
     {
         this(string, false);
     }
@@ -81,17 +77,16 @@ public class DERPrintableString
     /**
      * Constructor with optional validation.
      *
-     * @param string the base string to wrap.
+     * @param string   the base string to wrap.
      * @param validate whether or not to check the string.
      * @throws IllegalArgumentException if validate is true and the string
-     * contains characters that should not be in a PrintableString.
+     *                                  contains characters that should not be in a PrintableString.
      */
     public DERPrintableString(
-        String   string,
-        boolean  validate)
+            String string,
+            boolean validate)
     {
-        if (validate && !isPrintableString(string))
-        {
+        if (validate && !isPrintableString(string)) {
             throw new IllegalArgumentException("string contains illegal characters");
         }
 
@@ -105,20 +100,19 @@ public class DERPrintableString
 
     public byte[] getOctets()
     {
-        char[]  cs = string.toCharArray();
-        byte[]  bs = new byte[cs.length];
+        char[] cs = string.toCharArray();
+        byte[] bs = new byte[cs.length];
 
-        for (int i = 0; i != cs.length; i++)
-        {
-            bs[i] = (byte)cs[i];
+        for (int i = 0; i != cs.length; i++) {
+            bs[i] = (byte) cs[i];
         }
 
-        return bs; 
+        return bs;
     }
 
     void encode(
-        DEROutputStream  out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
         out.writeEncoded(PRINTABLE_STRING, this.getOctets());
     }
@@ -129,14 +123,13 @@ public class DERPrintableString
     }
 
     boolean asn1Equals(
-        DERObject  o)
+            DERObject o)
     {
-        if (!(o instanceof DERPrintableString))
-        {
+        if (!(o instanceof DERPrintableString)) {
             return false;
         }
 
-        DERPrintableString  s = (DERPrintableString)o;
+        DERPrintableString s = (DERPrintableString) o;
 
         return this.getString().equals(s.getString());
     }
@@ -153,47 +146,41 @@ public class DERPrintableString
      * @return true if in printable set, false otherwise.
      */
     public static boolean isPrintableString(
-        String  str)
+            String str)
     {
-        for (int i = str.length() - 1; i >= 0; i--)
-        {
-            char    ch = str.charAt(i);
+        for (int i = str.length() - 1; i >= 0; i--) {
+            char ch = str.charAt(i);
 
-            if (ch > 0x007f)
-            {
+            if (ch > 0x007f) {
                 return false;
             }
 
-            if ('a' <= ch && ch <= 'z')
-            {
+            if ('a' <= ch && ch <= 'z') {
                 continue;
             }
 
-            if ('A' <= ch && ch <= 'Z')
-            {
+            if ('A' <= ch && ch <= 'Z') {
                 continue;
             }
 
-            if ('0' <= ch && ch <= '9')
-            {
+            if ('0' <= ch && ch <= '9') {
                 continue;
             }
 
-            switch (ch)
-            {
-            case ' ':
-            case '\'':
-            case '(':
-            case ')':
-            case '+':
-            case '-':
-            case '.':
-            case ':':
-            case '=':
-            case '?':
-            case '/':
-            case ',':
-                continue;
+            switch (ch) {
+                case ' ':
+                case '\'':
+                case '(':
+                case ')':
+                case '+':
+                case '-':
+                case '.':
+                case ':':
+                case '=':
+                case '?':
+                case '/':
+                case ',':
+                    continue;
             }
 
             return false;

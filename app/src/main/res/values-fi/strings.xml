@@ -28,7 +28,7 @@
     <string name="add_group_title">Lisää ryhmä</string>
     <string name="algorithm">Algoritmi</string>
     <string name="algorithm_colon">Algoritmi:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Ohjelman aikakatkaisu</string>
     <string name="app_timeout_summary">Aika, jonka jälkeen KeePass lukitaan jos se on ollut toimeton.</string>
     <string name="application">Ohjelma</string>

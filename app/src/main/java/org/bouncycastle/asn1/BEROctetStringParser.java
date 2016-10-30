@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public class BEROctetStringParser
-    implements ASN1OctetStringParser
+        implements ASN1OctetStringParser
 {
     private ASN1StreamParser _parser;
 
     BEROctetStringParser(
-        ASN1StreamParser parser)
+            ASN1StreamParser parser)
     {
         _parser = parser;
     }
@@ -20,7 +20,7 @@ public class BEROctetStringParser
      * @deprecated will be removed
      */
     protected BEROctetStringParser(
-        ASN1ObjectParser parser)
+            ASN1ObjectParser parser)
     {
         _parser = parser._aIn;
     }
@@ -32,12 +32,9 @@ public class BEROctetStringParser
 
     public DERObject getDERObject()
     {
-        try
-        {
+        try {
             return new BERConstructedOctetString(Streams.readAll(getOctetStream()));
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ASN1ParsingException("IOException converting stream to byte array: " + e.getMessage(), e);
         }
     }

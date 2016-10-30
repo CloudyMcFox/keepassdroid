@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class BERSequenceGenerator
-    extends BERGenerator
+        extends BERGenerator
 {
     public BERSequenceGenerator(
-        OutputStream out) 
-        throws IOException
+            OutputStream out)
+            throws IOException
     {
         super(out);
 
@@ -16,25 +16,25 @@ public class BERSequenceGenerator
     }
 
     public BERSequenceGenerator(
-        OutputStream out,
-        int tagNo,
-        boolean isExplicit) 
-        throws IOException
+            OutputStream out,
+            int tagNo,
+            boolean isExplicit)
+            throws IOException
     {
         super(out, tagNo, isExplicit);
-        
+
         writeBERHeader(DERTags.CONSTRUCTED | DERTags.SEQUENCE);
     }
 
     public void addObject(
-        DEREncodable object)
-        throws IOException
+            DEREncodable object)
+            throws IOException
     {
         object.getDERObject().encode(new BEROutputStream(_out));
     }
-    
-    public void close() 
-        throws IOException
+
+    public void close()
+            throws IOException
     {
         writeBEREnd();
     }

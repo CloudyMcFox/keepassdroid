@@ -1,18 +1,18 @@
 package org.bouncycastle.crypto.params;
 
 public class DSAKeyParameters
-    extends AsymmetricKeyParameter
+        extends AsymmetricKeyParameter
 {
-    private DSAParameters    params;
+    private DSAParameters params;
 
     public DSAKeyParameters(
-        boolean         isPrivate,
-        DSAParameters   params)
+            boolean isPrivate,
+            DSAParameters params)
     {
         super(isPrivate);
 
         this.params = params;
-    }   
+    }
 
     public DSAParameters getParameters()
     {

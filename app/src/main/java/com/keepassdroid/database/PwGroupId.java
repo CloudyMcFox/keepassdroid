@@ -1,5 +1,6 @@
 package com.keepassdroid.database;
 
-public abstract class PwGroupId {
+public abstract class PwGroupId
+{
 
 }

@@ -31,7 +31,8 @@ import java.lang.reflect.Field;
 /**
  * Created by bpellin on 3/10/16.
  */
-public class StorageAF {
+public class StorageAF
+{
 
     public static String ACTION_OPEN_DOCUMENT;
 
@@ -45,10 +46,16 @@ public class StorageAF {
         }
     }
 
-    public static boolean supportsStorageFramework() { return BuildCompat.getSdkVersion() >= BuildCompat.VERSION_KITKAT; }
+    public static boolean supportsStorageFramework()
+    {
+        return BuildCompat.getSdkVersion() >= BuildCompat.VERSION_KITKAT;
+    }
 
-    public static boolean useStorageFramework(Context ctx) {
-        if (!supportsStorageFramework()) { return false; }
+    public static boolean useStorageFramework(Context ctx)
+    {
+        if (!supportsStorageFramework()) {
+            return false;
+        }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         return prefs.getBoolean(ctx.getString(R.string.saf_key), ctx.getResources().getBoolean(R.bool.saf_default));

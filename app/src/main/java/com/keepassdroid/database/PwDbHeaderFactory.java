@@ -19,15 +19,17 @@
  */
 package com.keepassdroid.database;
 
-public class PwDbHeaderFactory {
-	public static PwDbHeader getInstance(PwDatabase db) {
-		if (db instanceof PwDatabaseV3) {
-			return new PwDbHeaderV3();
-		} else if (db instanceof PwDatabaseV4) {
-			return new PwDbHeaderV4((PwDatabaseV4)db);
-		} else {
-			throw new RuntimeException("Not implemented.");
-			
-		}
-	}
+public class PwDbHeaderFactory
+{
+    public static PwDbHeader getInstance(PwDatabase db)
+    {
+        if (db instanceof PwDatabaseV3) {
+            return new PwDbHeaderV3();
+        } else if (db instanceof PwDatabaseV4) {
+            return new PwDbHeaderV4((PwDatabaseV4) db);
+        } else {
+            throw new RuntimeException("Not implemented.");
+
+        }
+    }
 }

@@ -4,12 +4,12 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public class DEROctetStringParser
-    implements ASN1OctetStringParser
+        implements ASN1OctetStringParser
 {
     private DefiniteLengthInputStream stream;
 
     DEROctetStringParser(
-        DefiniteLengthInputStream stream)
+            DefiniteLengthInputStream stream)
     {
         this.stream = stream;
     }
@@ -21,12 +21,9 @@ public class DEROctetStringParser
 
     public DERObject getDERObject()
     {
-        try
-        {
+        try {
             return new DEROctetString(stream.toByteArray());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ASN1ParsingException("IOException converting stream to byte array: " + e.getMessage(), e);
         }
     }

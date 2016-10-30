@@ -8,17 +8,17 @@ import org.bouncycastle.util.Arrays;
 /**
  * Base class for an application specific object
  */
-public class DERApplicationSpecific 
-    extends ASN1Object
+public class DERApplicationSpecific
+        extends ASN1Object
 {
-    private final boolean   isConstructed;
-    private final int       tag;
-    private final byte[]    octets;
+    private final boolean isConstructed;
+    private final int tag;
+    private final byte[] octets;
 
     DERApplicationSpecific(
-        boolean isConstructed,
-        int     tag,
-        byte[]  octets)
+            boolean isConstructed,
+            int tag,
+            byte[] octets)
     {
         this.isConstructed = isConstructed;
         this.tag = tag;
@@ -26,37 +26,34 @@ public class DERApplicationSpecific
     }
 
     public DERApplicationSpecific(
-        int    tag,
-        byte[] octets)
+            int tag,
+            byte[] octets)
     {
         this(false, tag, octets);
     }
 
     public DERApplicationSpecific(
-        int                  tag, 
-        DEREncodable         object) 
-        throws IOException 
+            int tag,
+            DEREncodable object)
+            throws IOException
     {
         this(true, tag, object);
     }
 
     public DERApplicationSpecific(
-        boolean      explicit,
-        int          tag,
-        DEREncodable object)
-        throws IOException
+            boolean explicit,
+            int tag,
+            DEREncodable object)
+            throws IOException
     {
         byte[] data = object.getDERObject().getDEREncoded();
 
         this.isConstructed = explicit;
         this.tag = tag;
 
-        if (explicit)
-        {
+        if (explicit) {
             this.octets = data;
-        }
-        else
-        {
+        } else {
             int lenBytes = getLengthOfLength(data);
             byte[] tmp = new byte[data.length - lenBytes];
             System.arraycopy(data, lenBytes, tmp, 0, tmp.length);
@@ -70,14 +67,10 @@ public class DERApplicationSpecific
         this.isConstructed = true;
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-        for (int i = 0; i != vec.size(); i++)
-        {
-            try
-            {
-                bOut.write(((ASN1Encodable)vec.get(i)).getEncoded());
-            }
-            catch (IOException e)
-            {
+        for (int i = 0; i != vec.size(); i++) {
+            try {
+                bOut.write(((ASN1Encodable) vec.get(i)).getEncoded());
+            } catch (IOException e) {
                 throw new ASN1ParsingException("malformed object: " + e, e);
             }
         }
@@ -88,8 +81,7 @@ public class DERApplicationSpecific
     {
         int count = 2;               // TODO: assumes only a 1 byte tag number
 
-        while((data[count - 1] & 0x80) != 0)
-        {
+        while ((data[count - 1] & 0x80) != 0) {
             count++;
         }
 
@@ -100,13 +92,13 @@ public class DERApplicationSpecific
     {
         return isConstructed;
     }
-    
+
     public byte[] getContents()
     {
         return octets;
     }
-    
-    public int getApplicationTag() 
+
+    public int getApplicationTag()
     {
         return tag;
     }
@@ -114,11 +106,11 @@ public class DERApplicationSpecific
     /**
      * Return the enclosed object assuming explicit tagging.
      *
-     * @return  the resulting object
+     * @return the resulting object
      * @throws IOException if reconstruction fails.
      */
-    public DERObject getObject() 
-        throws IOException 
+    public DERObject getObject()
+            throws IOException
     {
         return new ASN1InputStream(getContents()).readObject();
     }
@@ -127,55 +119,51 @@ public class DERApplicationSpecific
      * Return the enclosed object assuming implicit tagging.
      *
      * @param derTagNo the type tag that should be applied to the object's contents.
-     * @return  the resulting object
+     * @return the resulting object
      * @throws IOException if reconstruction fails.
      */
     public DERObject getObject(int derTagNo)
-        throws IOException
+            throws IOException
     {
-        if (derTagNo >= 0x1f)
-        {
+        if (derTagNo >= 0x1f) {
             throw new IOException("unsupported tag number");
         }
 
         byte[] orig = this.getEncoded();
         byte[] tmp = replaceTagNumber(derTagNo, orig);
 
-        if ((orig[0] & DERTags.CONSTRUCTED) != 0)
-        {
+        if ((orig[0] & DERTags.CONSTRUCTED) != 0) {
             tmp[0] |= DERTags.CONSTRUCTED;
         }
 
         return new ASN1InputStream(tmp).readObject();
     }
-    
+
     /* (non-Javadoc)
      * @see org.bouncycastle.asn1.DERObject#encode(org.bouncycastle.asn1.DEROutputStream)
      */
     void encode(DEROutputStream out) throws IOException
     {
         int classBits = DERTags.APPLICATION;
-        if (isConstructed)
-        {
-            classBits |= DERTags.CONSTRUCTED; 
+        if (isConstructed) {
+            classBits |= DERTags.CONSTRUCTED;
         }
 
         out.writeEncoded(classBits, tag, octets);
     }
-    
+
     boolean asn1Equals(
-        DERObject o)
+            DERObject o)
     {
-        if (!(o instanceof DERApplicationSpecific))
-        {
+        if (!(o instanceof DERApplicationSpecific)) {
             return false;
         }
 
-        DERApplicationSpecific other = (DERApplicationSpecific)o;
+        DERApplicationSpecific other = (DERApplicationSpecific) o;
 
         return isConstructed == other.isConstructed
-            && tag == other.tag
-            && Arrays.areEqual(octets, other.octets);
+                && tag == other.tag
+                && Arrays.areEqual(octets, other.octets);
     }
 
     public int hashCode()
@@ -184,15 +172,14 @@ public class DERApplicationSpecific
     }
 
     private byte[] replaceTagNumber(int newTag, byte[] input)
-        throws IOException
+            throws IOException
     {
         int tagNo = input[0] & 0x1f;
         int index = 1;
         //
         // with tagged object tag number is bottom 5 bits, or stored at the start of the content
         //
-        if (tagNo == 0x1f)
-        {
+        if (tagNo == 0x1f) {
             tagNo = 0;
 
             int b = input[index++] & 0xff;
@@ -204,8 +191,7 @@ public class DERApplicationSpecific
                 throw new ASN1ParsingException("corrupted stream - invalid high tag number found");
             }
 
-            while ((b >= 0) && ((b & 0x80) != 0))
-            {
+            while ((b >= 0) && ((b & 0x80) != 0)) {
                 tagNo |= (b & 0x7f);
                 tagNo <<= 7;
                 b = input[index++] & 0xff;
@@ -218,7 +204,7 @@ public class DERApplicationSpecific
 
         System.arraycopy(input, index, tmp, 1, tmp.length - 1);
 
-        tmp[0] = (byte)newTag;
+        tmp[0] = (byte) newTag;
 
         return tmp;
     }

@@ -45,7 +45,8 @@ import com.keepassdroid.database.exception.KeyFileEmptyException;
 import com.keepassdroid.stream.NullOutputStream;
 import com.keepassdroid.utils.Util;
 
-public abstract class PwDatabase {
+public abstract class PwDatabase
+{
 
     public byte masterKey[] = new byte[32];
     public byte[] finalKey;
@@ -56,8 +57,11 @@ public abstract class PwDatabase {
     public Map<UUID, PwEntry> entries = new HashMap<UUID, PwEntry>();
 
 
-    private static boolean isKDBExtension(String filename) {
-        if (filename == null) { return false; }
+    private static boolean isKDBExtension(String filename)
+    {
+        if (filename == null) {
+            return false;
+        }
 
         int extIdx = filename.lastIndexOf(".");
         if (extIdx == -1) return false;
@@ -65,7 +69,8 @@ public abstract class PwDatabase {
         return filename.substring(extIdx, filename.length()).equalsIgnoreCase(".kdb");
     }
 
-    public static PwDatabase getNewDBInstance(String filename) {
+    public static PwDatabase getNewDBInstance(String filename)
+    {
         if (isKDBExtension(filename)) {
             return new PwDatabaseV3();
         } else {
@@ -73,7 +78,8 @@ public abstract class PwDatabase {
         }
     }
 
-    public void makeFinalKey(byte[] masterSeed, byte[] masterSeed2, int numRounds) throws IOException {
+    public void makeFinalKey(byte[] masterSeed, byte[] masterSeed2, int numRounds) throws IOException
+    {
 
         // Write checksum Checksum
         MessageDigest md = null;
@@ -94,9 +100,10 @@ public abstract class PwDatabase {
 
     /**
      * Encrypt the master key a few times to make brute-force key-search harder
+     *
      * @throws IOException
      */
-    private static byte[] transformMasterKey( byte[] pKeySeed, byte[] pKey, int rounds ) throws IOException
+    private static byte[] transformMasterKey(byte[] pKeySeed, byte[] pKey, int rounds) throws IOException
     {
         FinalKey key = FinalKeyFactory.createFinalKey();
 
@@ -107,93 +114,98 @@ public abstract class PwDatabase {
     public abstract byte[] getMasterKey(String key, InputStream keyInputStream) throws InvalidKeyFileException, IOException;
 
     public void setMasterKey(String key, InputStream keyInputStream)
-            throws InvalidKeyFileException, IOException {
-                assert(key != null);
+            throws InvalidKeyFileException, IOException
+    {
+        assert (key != null);
 
-                masterKey = getMasterKey(key, keyInputStream);
-            }
+        masterKey = getMasterKey(key, keyInputStream);
+    }
 
     protected byte[] getCompositeKey(String key, InputStream keyInputStream)
-            throws InvalidKeyFileException, IOException {
-                assert(key != null && keyInputStream != null);
+            throws InvalidKeyFileException, IOException
+    {
+        assert (key != null && keyInputStream != null);
 
-                byte[] fileKey = getFileKey(keyInputStream);
+        byte[] fileKey = getFileKey(keyInputStream);
 
-                byte[] passwordKey = getPasswordKey(key);
+        byte[] passwordKey = getPasswordKey(key);
 
-                MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance("SHA-256");
-                } catch (NoSuchAlgorithmException e) {
-                    throw new IOException("SHA-256 not supported");
-                }
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("SHA-256 not supported");
+        }
 
-                md.update(passwordKey);
+        md.update(passwordKey);
 
-                return md.digest(fileKey);
+        return md.digest(fileKey);
     }
 
     protected byte[] getFileKey(InputStream keyInputStream)
-            throws InvalidKeyFileException, IOException {
-                assert(keyInputStream != null);
+            throws InvalidKeyFileException, IOException
+    {
+        assert (keyInputStream != null);
 
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                Util.copyStream(keyInputStream, bos);
-                byte[] keyData = bos.toByteArray();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        Util.copyStream(keyInputStream, bos);
+        byte[] keyData = bos.toByteArray();
 
-                ByteArrayInputStream bis = new ByteArrayInputStream(keyData);
-                byte[] key = loadXmlKeyFile(bis);
-                if ( key != null ) {
-                    return key;
-                }
+        ByteArrayInputStream bis = new ByteArrayInputStream(keyData);
+        byte[] key = loadXmlKeyFile(bis);
+        if (key != null) {
+            return key;
+        }
 
-                long fileSize = keyData.length;
-                if ( fileSize == 0 ) {
-                    throw new KeyFileEmptyException();
-                } else if ( fileSize == 32 ) {
-                    return keyData;
-                } else if ( fileSize == 64 ) {
-                    byte[] hex = new byte[64];
+        long fileSize = keyData.length;
+        if (fileSize == 0) {
+            throw new KeyFileEmptyException();
+        } else if (fileSize == 32) {
+            return keyData;
+        } else if (fileSize == 64) {
+            byte[] hex = new byte[64];
 
-                    try {
-                        return hexStringToByteArray(new String(keyData));
-                    } catch (IndexOutOfBoundsException e) {
-                        // Key is not base 64, treat it as binary data
-                    }
-                }
-
-                MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance("SHA-256");
-                } catch (NoSuchAlgorithmException e) {
-                    throw new IOException("SHA-256 not supported");
-                }
-                //SHA256Digest md = new SHA256Digest();
-                byte[] buffer = new byte[2048];
-                int offset = 0;
-
-                try {
-                    md.update(keyData);
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
-
-                return md.digest();
+            try {
+                return hexStringToByteArray(new String(keyData));
+            } catch (IndexOutOfBoundsException e) {
+                // Key is not base 64, treat it as binary data
             }
+        }
+
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("SHA-256 not supported");
+        }
+        //SHA256Digest md = new SHA256Digest();
+        byte[] buffer = new byte[2048];
+        int offset = 0;
+
+        try {
+            md.update(keyData);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
+        return md.digest();
+    }
 
     protected abstract byte[] loadXmlKeyFile(InputStream keyInputStream);
 
-    public static byte[] hexStringToByteArray(String s) {
+    public static byte[] hexStringToByteArray(String s)
+    {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                                 + Character.digit(s.charAt(i+1), 16));
+                    + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
 
-    public boolean validatePasswordEncoding(String key) {
+    public boolean validatePasswordEncoding(String key)
+    {
         String encoding = getPasswordEncoding();
 
         byte[] bKey;
@@ -216,11 +228,12 @@ public abstract class PwDatabase {
 
     protected abstract String getPasswordEncoding();
 
-    public byte[] getPasswordKey(String key) throws IOException {
-        assert(key!=null);
+    public byte[] getPasswordKey(String key) throws IOException
+    {
+        assert (key != null);
 
-        if ( key.length() == 0 )
-            throw new IllegalArgumentException( "Key cannot be empty." );
+        if (key.length() == 0)
+            throw new IllegalArgumentException("Key cannot be empty.");
 
         MessageDigest md;
         try {
@@ -236,7 +249,7 @@ public abstract class PwDatabase {
             assert false;
             bKey = key.getBytes();
         }
-        md.update(bKey, 0, bKey.length );
+        md.update(bKey, 0, bKey.length);
 
         return md.digest();
     }
@@ -255,9 +268,10 @@ public abstract class PwDatabase {
 
     public abstract PwEncryptionAlgorithm getEncAlgorithm();
 
-    public void addGroupTo(PwGroup newGroup, PwGroup parent) {
+    public void addGroupTo(PwGroup newGroup, PwGroup parent)
+    {
         // Add group to parent group
-        if ( parent == null ) {
+        if (parent == null) {
             parent = rootGroup;
         }
 
@@ -268,14 +282,16 @@ public abstract class PwDatabase {
         parent.touch(true, true);
     }
 
-    public void removeGroupFrom(PwGroup remove, PwGroup parent) {
+    public void removeGroupFrom(PwGroup remove, PwGroup parent)
+    {
         // Remove group from parent group
         parent.childGroups.remove(remove);
 
         groups.remove(remove.getId());
     }
 
-    public void addEntryTo(PwEntry newEntry, PwGroup parent) {
+    public void addEntryTo(PwEntry newEntry, PwGroup parent)
+    {
         // Add entry to parent
         if (parent != null) {
             parent.childEntries.add(newEntry);
@@ -285,7 +301,8 @@ public abstract class PwDatabase {
         entries.put(newEntry.getUUID(), newEntry);
     }
 
-    public void removeEntryFrom(PwEntry remove, PwGroup parent) {
+    public void removeEntryFrom(PwEntry remove, PwGroup parent)
+    {
         // Remove entry for parent
         if (parent != null) {
             parent.childEntries.remove(remove);
@@ -298,15 +315,15 @@ public abstract class PwDatabase {
     /**
      * Determine if an id number is already in use
      *
-     * @param id
-     *            ID number to check for
+     * @param id ID number to check for
      * @return True if the ID is used, false otherwise
      */
-    protected boolean isGroupIdUsed(PwGroupId id) {
+    protected boolean isGroupIdUsed(PwGroupId id)
+    {
         List<PwGroup> groups = getGroups();
 
         for (int i = 0; i < groups.size(); i++) {
-            PwGroup group =groups.get(i);
+            PwGroup group = groups.get(i);
             if (group.getId().equals(id)) {
                 return true;
             }
@@ -319,56 +336,65 @@ public abstract class PwDatabase {
 
     public abstract boolean isBackup(PwGroup group);
 
-    public void populateGlobals(PwGroup currentGroup) {
+    public void populateGlobals(PwGroup currentGroup)
+    {
 
         List<PwGroup> childGroups = currentGroup.childGroups;
         List<PwEntry> childEntries = currentGroup.childEntries;
 
-        for (int i = 0; i < childEntries.size(); i++ ) {
+        for (int i = 0; i < childEntries.size(); i++) {
             PwEntry cur = childEntries.get(i);
             entries.put(cur.getUUID(), cur);
         }
 
-        for (int i = 0; i < childGroups.size(); i++ ) {
+        for (int i = 0; i < childGroups.size(); i++) {
             PwGroup cur = childGroups.get(i);
             groups.put(cur.getId(), cur);
             populateGlobals(cur);
         }
     }
 
-    public boolean canRecycle(PwGroup group) {
+    public boolean canRecycle(PwGroup group)
+    {
         return false;
     }
 
-    public boolean canRecycle(PwEntry entry) {
+    public boolean canRecycle(PwEntry entry)
+    {
         return false;
     }
 
-    public void recycle(PwEntry entry) {
+    public void recycle(PwEntry entry)
+    {
         // Assume calls to this are protected by calling inRecyleBin
         throw new RuntimeException("Call not valid for .kdb databases.");
     }
 
-    public void undoRecycle(PwEntry entry, PwGroup origParent) {
+    public void undoRecycle(PwEntry entry, PwGroup origParent)
+    {
         throw new RuntimeException("Call not valid for .kdb databases.");
     }
 
-    public void deleteEntry(PwEntry entry) {
+    public void deleteEntry(PwEntry entry)
+    {
         PwGroup parent = entry.getParent();
         removeEntryFrom(entry, parent);
         parent.touch(false, true);
 
     }
 
-    public void undoDeleteEntry(PwEntry entry, PwGroup origParent) {
+    public void undoDeleteEntry(PwEntry entry, PwGroup origParent)
+    {
         addEntryTo(entry, origParent);
     }
 
-    public PwGroup getRecycleBin() {
+    public PwGroup getRecycleBin()
+    {
         return null;
     }
 
-    public boolean isGroupSearchable(PwGroup group, boolean omitBackup) {
+    public boolean isGroupSearchable(PwGroup group, boolean omitBackup)
+    {
         return group != null;
     }
 

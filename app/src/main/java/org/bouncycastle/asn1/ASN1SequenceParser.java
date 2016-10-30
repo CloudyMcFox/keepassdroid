@@ -3,8 +3,8 @@ package org.bouncycastle.asn1;
 import java.io.IOException;
 
 public interface ASN1SequenceParser
-    extends DEREncodable
+        extends DEREncodable
 {
     DEREncodable readObject()
-        throws IOException;
+            throws IOException;
 }

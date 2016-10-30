@@ -19,8 +19,9 @@
  */
 package com.keepassdroid.database;
 
-public class PwDatabaseV4Debug extends PwDatabaseV4 {
-	public byte[] postHeader;
-	public PwDbHeaderV3 dbHeader;
+public class PwDatabaseV4Debug extends PwDatabaseV4
+{
+    public byte[] postHeader;
+    public PwDbHeaderV3 dbHeader;
 
 }

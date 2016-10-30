@@ -28,7 +28,7 @@
     <string name="add_group_title">新しいグループ名を入力</string>
     <string name="algorithm">アルゴリズム</string>
     <string name="algorithm_colon">アルゴリズム:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">アプリケーション タイムアウト</string>
     <string name="app_timeout_summary">KeePassがこの時間非アクティブだった場合、データベースをロックします。</string>
     <string name="application">アプリケーション</string>

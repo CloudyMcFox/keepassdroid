@@ -6,32 +6,29 @@ import java.io.IOException;
  * DER NumericString object - this is an ascii string of characters {0,1,2,3,4,5,6,7,8,9, }.
  */
 public class DERNumericString
-    extends ASN1Object
-    implements DERString
+        extends ASN1Object
+        implements DERString
 {
-    String  string;
+    String string;
 
     /**
      * return a Numeric string from the passed in object
      *
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static DERNumericString getInstance(
-        Object  obj)
+            Object obj)
     {
-        if (obj == null || obj instanceof DERNumericString)
-        {
-            return (DERNumericString)obj;
+        if (obj == null || obj instanceof DERNumericString) {
+            return (DERNumericString) obj;
         }
 
-        if (obj instanceof ASN1OctetString)
-        {
-            return new DERNumericString(((ASN1OctetString)obj).getOctets());
+        if (obj instanceof ASN1OctetString) {
+            return new DERNumericString(((ASN1OctetString) obj).getOctets());
         }
 
-        if (obj instanceof ASN1TaggedObject)
-        {
-            return getInstance(((ASN1TaggedObject)obj).getObject());
+        if (obj instanceof ASN1TaggedObject) {
+            return getInstance(((ASN1TaggedObject) obj).getObject());
         }
 
         throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
@@ -40,15 +37,15 @@ public class DERNumericString
     /**
      * return an Numeric String from a tagged object.
      *
-     * @param obj the tagged object holding the object we want
+     * @param obj      the tagged object holding the object we want
      * @param explicit true if the object is meant to be explicitly
-     *              tagged false otherwise.
-     * @exception IllegalArgumentException if the tagged object cannot
-     *               be converted.
+     *                 tagged false otherwise.
+     * @throws IllegalArgumentException if the tagged object cannot
+     *                                  be converted.
      */
     public static DERNumericString getInstance(
-        ASN1TaggedObject obj,
-        boolean          explicit)
+            ASN1TaggedObject obj,
+            boolean explicit)
     {
         return getInstance(obj.getObject());
     }
@@ -57,13 +54,12 @@ public class DERNumericString
      * basic constructor - with bytes.
      */
     public DERNumericString(
-        byte[]   string)
+            byte[] string)
     {
-        char[]  cs = new char[string.length];
+        char[] cs = new char[string.length];
 
-        for (int i = 0; i != cs.length; i++)
-        {
-            cs[i] = (char)(string[i] & 0xff);
+        for (int i = 0; i != cs.length; i++) {
+            cs[i] = (char) (string[i] & 0xff);
         }
 
         this.string = new String(cs);
@@ -73,7 +69,7 @@ public class DERNumericString
      * basic constructor -  without validation..
      */
     public DERNumericString(
-        String   string)
+            String string)
     {
         this(string, false);
     }
@@ -81,17 +77,16 @@ public class DERNumericString
     /**
      * Constructor with optional validation.
      *
-     * @param string the base string to wrap.
+     * @param string   the base string to wrap.
      * @param validate whether or not to check the string.
      * @throws IllegalArgumentException if validate is true and the string
-     * contains characters that should not be in a NumericString.
+     *                                  contains characters that should not be in a NumericString.
      */
     public DERNumericString(
-        String   string,
-        boolean  validate)
+            String string,
+            boolean validate)
     {
-        if (validate && !isNumericString(string))
-        {
+        if (validate && !isNumericString(string)) {
             throw new IllegalArgumentException("string contains illegal characters");
         }
 
@@ -110,20 +105,19 @@ public class DERNumericString
 
     public byte[] getOctets()
     {
-        char[]  cs = string.toCharArray();
-        byte[]  bs = new byte[cs.length];
+        char[] cs = string.toCharArray();
+        byte[] bs = new byte[cs.length];
 
-        for (int i = 0; i != cs.length; i++)
-        {
-            bs[i] = (byte)cs[i];
+        for (int i = 0; i != cs.length; i++) {
+            bs[i] = (byte) cs[i];
         }
 
-        return bs; 
+        return bs;
     }
 
     void encode(
-        DEROutputStream  out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
         out.writeEncoded(NUMERIC_STRING, this.getOctets());
     }
@@ -134,14 +128,13 @@ public class DERNumericString
     }
 
     boolean asn1Equals(
-        DERObject  o)
+            DERObject o)
     {
-        if (!(o instanceof DERNumericString))
-        {
+        if (!(o instanceof DERNumericString)) {
             return false;
         }
 
-        DERNumericString  s = (DERNumericString)o;
+        DERNumericString s = (DERNumericString) o;
 
         return this.getString().equals(s.getString());
     }
@@ -153,19 +146,16 @@ public class DERNumericString
      * @return true if numeric, fale otherwise.
      */
     public static boolean isNumericString(
-        String  str)
+            String str)
     {
-        for (int i = str.length() - 1; i >= 0; i--)
-        {
-            char    ch = str.charAt(i);
+        for (int i = str.length() - 1; i >= 0; i--) {
+            char ch = str.charAt(i);
 
-            if (ch > 0x007f)
-            {
+            if (ch > 0x007f) {
                 return false;
             }
 
-            if (('0' <= ch && ch <= '9') || ch == ' ')
-            {
+            if (('0' <= ch && ch <= '9') || ch == ' ') {
                 continue;
             }
 

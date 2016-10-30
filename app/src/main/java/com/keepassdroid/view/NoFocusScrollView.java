@@ -26,23 +26,28 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ScrollView;
 
-public class NoFocusScrollView extends ScrollView {
+public class NoFocusScrollView extends ScrollView
+{
 
-	public NoFocusScrollView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
+    public NoFocusScrollView(Context context, AttributeSet attrs, int defStyle)
+    {
+        super(context, attrs, defStyle);
+    }
 
-	public NoFocusScrollView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    public NoFocusScrollView(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+    }
 
-	public NoFocusScrollView(Context context) {
-		super(context);
-	}
+    public NoFocusScrollView(Context context)
+    {
+        super(context);
+    }
 
-	@Override
-	public ArrayList<View> getFocusables(int direction) {
-		return new ArrayList<View>();
-	}
+    @Override
+    public ArrayList<View> getFocusables(int direction)
+    {
+        return new ArrayList<View>();
+    }
 
 }

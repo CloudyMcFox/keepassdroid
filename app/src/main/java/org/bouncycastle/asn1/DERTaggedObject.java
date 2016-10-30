@@ -8,30 +8,30 @@ import java.io.IOException;
  * rules (as with sequences).
  */
 public class DERTaggedObject
-    extends ASN1TaggedObject
+        extends ASN1TaggedObject
 {
     private static final byte[] ZERO_BYTES = new byte[0];
 
     /**
      * @param tagNo the tag number for this object.
-     * @param obj the tagged object.
+     * @param obj   the tagged object.
      */
     public DERTaggedObject(
-        int             tagNo,
-        DEREncodable    obj)
+            int tagNo,
+            DEREncodable obj)
     {
         super(tagNo, obj);
     }
 
     /**
      * @param explicit true if an explicitly tagged object.
-     * @param tagNo the tag number for this object.
-     * @param obj the tagged object.
+     * @param tagNo    the tag number for this object.
+     * @param obj      the tagged object.
      */
     public DERTaggedObject(
-        boolean         explicit,
-        int             tagNo,
-        DEREncodable    obj)
+            boolean explicit,
+            int tagNo,
+            DEREncodable obj)
     {
         super(explicit, tagNo, obj);
     }
@@ -41,44 +41,35 @@ public class DERTaggedObject
      * length sequence.
      */
     public DERTaggedObject(
-        int             tagNo)
+            int tagNo)
     {
         super(false, tagNo, new DERSequence());
     }
 
     void encode(
-        DEROutputStream  out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
-        if (!empty)
-        {
+        if (!empty) {
             byte[] bytes = obj.getDERObject().getEncoded(DER);
 
-            if (explicit)
-            {
+            if (explicit) {
                 out.writeEncoded(CONSTRUCTED | TAGGED, tagNo, bytes);
-            }
-            else
-            {
+            } else {
                 //
                 // need to mark constructed types...
                 //
                 int flags;
-                if ((bytes[0] & CONSTRUCTED) != 0)
-                {
+                if ((bytes[0] & CONSTRUCTED) != 0) {
                     flags = CONSTRUCTED | TAGGED;
-                }
-                else
-                {
+                } else {
                     flags = TAGGED;
                 }
 
                 out.writeTag(flags, tagNo);
                 out.write(bytes, 1, bytes.length - 1);
             }
-        }
-        else
-        {
+        } else {
             out.writeEncoded(CONSTRUCTED | TAGGED, tagNo, ZERO_BYTES);
         }
     }

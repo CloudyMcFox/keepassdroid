@@ -5,7 +5,7 @@ import java.util.Enumeration;
 
 @SuppressWarnings("unchecked")
 public class BERSequence
-    extends DERSequence
+        extends DERSequence
 {
     /**
      * create an empty sequence
@@ -18,7 +18,7 @@ public class BERSequence
      * create a sequence containing one object
      */
     public BERSequence(
-        DEREncodable    obj)
+            DEREncodable obj)
     {
         super(obj);
     }
@@ -27,7 +27,7 @@ public class BERSequence
      * create a sequence containing a vector of objects.
      */
     public BERSequence(
-        DEREncodableVector   v)
+            DEREncodableVector v)
     {
         super(v);
     }
@@ -35,25 +35,21 @@ public class BERSequence
     /*
      */
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
-        if (out instanceof ASN1OutputStream || out instanceof BEROutputStream)
-        {
+        if (out instanceof ASN1OutputStream || out instanceof BEROutputStream) {
             out.write(SEQUENCE | CONSTRUCTED);
             out.write(0x80);
-            
+
             Enumeration e = getObjects();
-            while (e.hasMoreElements())
-            {
+            while (e.hasMoreElements()) {
                 out.writeObject(e.nextElement());
             }
-        
+
             out.write(0x00);
             out.write(0x00);
-        }
-        else
-        {
+        } else {
             super.encode(out);
         }
     }

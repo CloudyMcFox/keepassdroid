@@ -3,7 +3,7 @@ package org.bouncycastle.asn1;
 import java.io.IOException;
 
 public class BERApplicationSpecificParser
-    implements ASN1ApplicationSpecificParser
+        implements ASN1ApplicationSpecificParser
 {
     private final int tag;
     private final ASN1StreamParser parser;
@@ -15,19 +15,16 @@ public class BERApplicationSpecificParser
     }
 
     public DEREncodable readObject()
-        throws IOException
+            throws IOException
     {
         return parser.readObject();
     }
 
     public DERObject getDERObject()
     {
-        try
-        {
+        try {
             return new BERApplicationSpecific(tag, parser.readVector());
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ASN1ParsingException(e.getMessage(), e);
         }
     }

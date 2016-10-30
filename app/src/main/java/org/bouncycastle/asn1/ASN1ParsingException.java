@@ -2,7 +2,7 @@ package org.bouncycastle.asn1;
 
 @SuppressWarnings("serial")
 public class ASN1ParsingException
-    extends IllegalStateException
+        extends IllegalStateException
 {
     private Throwable cause;
 

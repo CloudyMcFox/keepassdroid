@@ -15,21 +15,19 @@ class DefiniteLengthInputStream
     private int _remaining;
 
     DefiniteLengthInputStream(
-        InputStream in,
-        int         length)
+            InputStream in,
+            int length)
     {
         super(in);
 
-        if (length < 0)
-        {
+        if (length < 0) {
             throw new IllegalArgumentException("negative lengths not allowed");
         }
 
         this._originalLength = length;
         this._remaining = length;
 
-        if (length == 0)
-        {
+        if (length == 0) {
             setParentEofDetect(true);
         }
     }
@@ -40,22 +38,19 @@ class DefiniteLengthInputStream
     }
 
     public int read()
-        throws IOException
+            throws IOException
     {
-        if (_remaining == 0)
-        {
+        if (_remaining == 0) {
             return -1;
         }
 
         int b = _in.read();
 
-        if (b < 0)
-        {
+        if (b < 0) {
             throw new EOFException("DEF length " + _originalLength + " object truncated by " + _remaining);
         }
 
-        if (--_remaining == 0)
-        {
+        if (--_remaining == 0) {
             setParentEofDetect(true);
         }
 
@@ -63,23 +58,20 @@ class DefiniteLengthInputStream
     }
 
     public int read(byte[] buf, int off, int len)
-        throws IOException
+            throws IOException
     {
-        if (_remaining == 0)
-        {
+        if (_remaining == 0) {
             return -1;
         }
 
         int toRead = Math.min(len, _remaining);
         int numRead = _in.read(buf, off, toRead);
 
-        if (numRead < 0)
-        {
+        if (numRead < 0) {
             throw new EOFException("DEF length " + _originalLength + " object truncated by " + _remaining);
         }
 
-        if ((_remaining -= numRead) == 0)
-        {
+        if ((_remaining -= numRead) == 0) {
             setParentEofDetect(true);
         }
 
@@ -87,16 +79,14 @@ class DefiniteLengthInputStream
     }
 
     byte[] toByteArray()
-        throws IOException
+            throws IOException
     {
-        if (_remaining == 0)
-        {
+        if (_remaining == 0) {
             return EMPTY_BYTES;
         }
 
         byte[] bytes = new byte[_remaining];
-        if ((_remaining -= Streams.readFully(_in, bytes)) != 0)
-        {
+        if ((_remaining -= Streams.readFully(_in, bytes)) != 0) {
             throw new EOFException("DEF length " + _originalLength + " object truncated by " + _remaining);
         }
         setParentEofDetect(true);

@@ -5,24 +5,23 @@ package org.bouncycastle.crypto;
  * can be treated like stream ciphers.
  */
 public class StreamBlockCipher
-    implements StreamCipher
+        implements StreamCipher
 {
-    private BlockCipher  cipher;
+    private BlockCipher cipher;
 
-    private byte[]  oneByte = new byte[1];
+    private byte[] oneByte = new byte[1];
 
     /**
      * basic constructor.
      *
      * @param cipher the block cipher to be wrapped.
-     * @exception IllegalArgumentException if the cipher has a block size other than
-     * one.
+     * @throws IllegalArgumentException if the cipher has a block size other than
+     *                                  one.
      */
     public StreamBlockCipher(
-        BlockCipher cipher)
+            BlockCipher cipher)
     {
-        if (cipher.getBlockSize() != 1)
-        {
+        if (cipher.getBlockSize() != 1) {
             throw new IllegalArgumentException("block cipher block size != 1.");
         }
 
@@ -33,11 +32,11 @@ public class StreamBlockCipher
      * initialise the underlying cipher.
      *
      * @param forEncryption true if we are setting up for encryption, false otherwise.
-     * @param params the necessary parameters for the underlying cipher to be initialised.
+     * @param params        the necessary parameters for the underlying cipher to be initialised.
      */
     public void init(
-        boolean forEncryption,
-        CipherParameters params)
+            boolean forEncryption,
+            CipherParameters params)
     {
         cipher.init(forEncryption, params);
     }
@@ -59,7 +58,7 @@ public class StreamBlockCipher
      * @return the result of processing the input byte.
      */
     public byte returnByte(
-        byte    in)
+            byte in)
     {
         oneByte[0] = in;
 
@@ -70,30 +69,28 @@ public class StreamBlockCipher
 
     /**
      * process a block of bytes from in putting the result into out.
-     * 
-     * @param in the input byte array.
-     * @param inOff the offset into the in array where the data to be processed starts.
-     * @param len the number of bytes to be processed.
-     * @param out the output buffer the processed bytes go into.   
+     *
+     * @param in     the input byte array.
+     * @param inOff  the offset into the in array where the data to be processed starts.
+     * @param len    the number of bytes to be processed.
+     * @param out    the output buffer the processed bytes go into.
      * @param outOff the offset into the output byte array the processed data stars at.
-     * @exception DataLengthException if the output buffer is too small.
+     * @throws DataLengthException if the output buffer is too small.
      */
     public void processBytes(
-        byte[]  in,
-        int     inOff,
-        int     len,
-        byte[]  out,
-        int     outOff)
-        throws DataLengthException
+            byte[] in,
+            int inOff,
+            int len,
+            byte[] out,
+            int outOff)
+            throws DataLengthException
     {
-        if (outOff + len > out.length)
-        {
+        if (outOff + len > out.length) {
             throw new DataLengthException("output buffer too small in processBytes()");
         }
 
-        for (int i = 0; i != len; i++)
-        {
-                cipher.processBlock(in, inOff + i, out, outOff + i);
+        for (int i = 0; i != len; i++) {
+            cipher.processBlock(in, inOff + i, out, outOff + i);
         }
     }
 

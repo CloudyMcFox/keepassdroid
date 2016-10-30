@@ -5,21 +5,21 @@ import org.bouncycastle.crypto.CipherParameters;
 import java.security.SecureRandom;
 
 public class ParametersWithRandom
-    implements CipherParameters
+        implements CipherParameters
 {
-    private SecureRandom        random;
-    private CipherParameters    parameters;
+    private SecureRandom random;
+    private CipherParameters parameters;
 
     public ParametersWithRandom(
-        CipherParameters    parameters,
-        SecureRandom        random)
+            CipherParameters parameters,
+            SecureRandom random)
     {
         this.random = random;
         this.parameters = parameters;
     }
 
     public ParametersWithRandom(
-        CipherParameters    parameters)
+            CipherParameters parameters)
     {
         this(parameters, new SecureRandom());
     }

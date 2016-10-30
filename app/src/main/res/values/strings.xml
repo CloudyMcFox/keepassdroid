@@ -31,7 +31,7 @@
     <string name="add_string">Add string</string>
     <string name="algorithm">Algorithm</string>
     <string name="algorithm_colon">Algorithm:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Application timeout</string>
     <string name="app_timeout_summary">Time before locking database when the application is inactive.</string>
     <string name="application">Application</string>
@@ -156,6 +156,7 @@
     <string name="open_recent">Open recent database (click to open):</string>
     <string name="omitbackup_title">Don\'t search backup entries</string>
     <string name="omitbackup_summary">Omit \'Backup\' group from search results (applies to .kdb only)</string>
+    <string name="open_apps">Find Open Apps</string>
     <string name="pass_filename">KeePass database filename:</string>
     <string name="password_title">Enter database password</string>
     <string name="progress_create">Creating new database&#8230;</string>

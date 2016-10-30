@@ -4,7 +4,7 @@ import java.io.IOException;
 
 @SuppressWarnings("serial")
 public class StreamOverflowException
-    extends IOException
+        extends IOException
 {
     public StreamOverflowException(String msg)
     {

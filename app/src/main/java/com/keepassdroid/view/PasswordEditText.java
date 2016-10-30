@@ -26,39 +26,46 @@ import android.widget.EditText;
 
 import com.keepassdroid.assets.TypefaceFactory;
 
-public class PasswordEditText extends EditText {
+public class PasswordEditText extends EditText
+{
 
-	public PasswordEditText(Context context, AttributeSet attrs,
-			int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-	}
+    public PasswordEditText(Context context, AttributeSet attrs,
+                            int defStyleAttr)
+    {
+        super(context, attrs, defStyleAttr);
+    }
 
-	public PasswordEditText(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
+    public PasswordEditText(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+    }
 
-	public PasswordEditText(Context context) {
-		super(context);
-	}
+    public PasswordEditText(Context context)
+    {
+        super(context);
+    }
 
-	private Typeface getTypeface(Typeface tf) {
-		Typeface tfOverride = TypefaceFactory.getTypeface(getContext(), "fonts/DejaVuSansMono.ttf");
-		
-		if (tfOverride != null) {
-			return tfOverride;
-		}
-		
-		return tf;
-	}
+    private Typeface getTypeface(Typeface tf)
+    {
+        Typeface tfOverride = TypefaceFactory.getTypeface(getContext(), "fonts/DejaVuSansMono.ttf");
 
-	@Override
-	public void setTypeface(Typeface tf, int style) {
-		super.setTypeface(getTypeface(tf), style);
-	}
+        if (tfOverride != null) {
+            return tfOverride;
+        }
 
-	@Override
-	public void setTypeface(Typeface tf) {
-		super.setTypeface(getTypeface(tf));
-	}
+        return tf;
+    }
+
+    @Override
+    public void setTypeface(Typeface tf, int style)
+    {
+        super.setTypeface(getTypeface(tf), style);
+    }
+
+    @Override
+    public void setTypeface(Typeface tf)
+    {
+        super.setTypeface(getTypeface(tf));
+    }
 
 }

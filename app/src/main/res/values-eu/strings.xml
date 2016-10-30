@@ -30,7 +30,7 @@
     <string name="add_group_title">Taldea gehitu</string>
     <string name="algorithm">Algoritmoa</string>
     <string name="algorithm_colon">Algoritmoa:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Aplikazioa itzaltzeko denbora</string>
     <string name="app_timeout_summary">Denbora datubasea blokeatu baino lehenago aplikazioa erabili gabe dagoenean</string>
     <string name="application">Aplikazioa</string>

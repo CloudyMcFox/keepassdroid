@@ -10,26 +10,24 @@ import java.util.SimpleTimeZone;
  * UTC time object.
  */
 public class DERUTCTime
-    extends ASN1Object
+        extends ASN1Object
 {
-    String      time;
+    String time;
 
     /**
      * return an UTC Time from the passed in object.
      *
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static DERUTCTime getInstance(
-        Object  obj)
+            Object obj)
     {
-        if (obj == null || obj instanceof DERUTCTime)
-        {
-            return (DERUTCTime)obj;
+        if (obj == null || obj instanceof DERUTCTime) {
+            return (DERUTCTime) obj;
         }
 
-        if (obj instanceof ASN1OctetString)
-        {
-            return new DERUTCTime(((ASN1OctetString)obj).getOctets());
+        if (obj instanceof ASN1OctetString) {
+            return new DERUTCTime(((ASN1OctetString) obj).getOctets());
         }
 
         throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
@@ -38,19 +36,19 @@ public class DERUTCTime
     /**
      * return an UTC Time from a tagged object.
      *
-     * @param obj the tagged object holding the object we want
+     * @param obj      the tagged object holding the object we want
      * @param explicit true if the object is meant to be explicitly
-     *              tagged false otherwise.
-     * @exception IllegalArgumentException if the tagged object cannot
-     *               be converted.
+     *                 tagged false otherwise.
+     * @throws IllegalArgumentException if the tagged object cannot
+     *                                  be converted.
      */
     public static DERUTCTime getInstance(
-        ASN1TaggedObject obj,
-        boolean          explicit)
+            ASN1TaggedObject obj,
+            boolean explicit)
     {
         return getInstance(obj.getObject());
     }
-    
+
     /**
      * The correct format for this is YYMMDDHHMMSSZ (it used to be that seconds were
      * never encoded. When you're creating one of these objects from scratch, that's
@@ -62,15 +60,12 @@ public class DERUTCTime
      * @param time the time string.
      */
     public DERUTCTime(
-        String  time)
+            String time)
     {
         this.time = time;
-        try
-        {
+        try {
             this.getDate();
-        }
-        catch (ParseException e)
-        {
+        } catch (ParseException e) {
             throw new IllegalArgumentException("invalid date string: " + e.getMessage());
         }
     }
@@ -79,26 +74,25 @@ public class DERUTCTime
      * base constructer from a java.util.date object
      */
     public DERUTCTime(
-        Date time)
+            Date time)
     {
         SimpleDateFormat dateF = new SimpleDateFormat("yyMMddHHmmss'Z'");
 
-        dateF.setTimeZone(new SimpleTimeZone(0,"Z"));
+        dateF.setTimeZone(new SimpleTimeZone(0, "Z"));
 
         this.time = dateF.format(time);
     }
 
     DERUTCTime(
-        byte[]  bytes)
+            byte[] bytes)
     {
         //
         // explicitly convert to characters
         //
-        char[]  dateC = new char[bytes.length];
+        char[] dateC = new char[bytes.length];
 
-        for (int i = 0; i != dateC.length; i++)
-        {
-            dateC[i] = (char)(bytes[i] & 0xff);
+        for (int i = 0; i != dateC.length; i++) {
+            dateC[i] = (char) (bytes[i] & 0xff);
         }
 
         this.time = new String(dateC);
@@ -109,10 +103,10 @@ public class DERUTCTime
      * standardised processing use getAdjustedDate().
      *
      * @return the resulting date
-     * @exception ParseException if the date string cannot be parsed.
+     * @throws ParseException if the date string cannot be parsed.
      */
     public Date getDate()
-        throws ParseException
+            throws ParseException
     {
         SimpleDateFormat dateF = new SimpleDateFormat("yyMMddHHmmssz");
 
@@ -124,10 +118,10 @@ public class DERUTCTime
      * in the range of 1950 - 2049.
      *
      * @return a date in the range of 1950 to 2049.
-     * @exception ParseException if the date string cannot be parsed.
+     * @throws ParseException if the date string cannot be parsed.
      */
     public Date getAdjustedDate()
-        throws ParseException
+            throws ParseException
     {
         SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMddHHmmssz");
 
@@ -137,8 +131,8 @@ public class DERUTCTime
     }
 
     /**
-     * return the time - always in the form of 
-     *  YYMMDDhhmmssGMT(+hh:mm|-hh:mm).
+     * return the time - always in the form of
+     * YYMMDDhhmmssGMT(+hh:mm|-hh:mm).
      * <p>
      * Normally in a certificate we would expect "Z" rather than "GMT",
      * however adding the "GMT" means we can just use:
@@ -157,38 +151,27 @@ public class DERUTCTime
         //
         // standardise the format.
         //
-        if (time.indexOf('-') < 0 && time.indexOf('+') < 0)
-        {
-            if (time.length() == 11)
-            {
+        if (time.indexOf('-') < 0 && time.indexOf('+') < 0) {
+            if (time.length() == 11) {
                 return time.substring(0, 10) + "00GMT+00:00";
-            }
-            else
-            {
+            } else {
                 return time.substring(0, 12) + "GMT+00:00";
             }
-        }
-        else
-        {
+        } else {
             int index = time.indexOf('-');
-            if (index < 0)
-            {
+            if (index < 0) {
                 index = time.indexOf('+');
             }
             String d = time;
 
-            if (index == time.length() - 3)
-            {
+            if (index == time.length() - 3) {
                 d += "00";
             }
 
-            if (index == 10)
-            {
+            if (index == 10) {
                 return d.substring(0, 10) + "00GMT" + d.substring(10, 13) + ":" + d.substring(13, 15);
-            }
-            else
-            {
-                return d.substring(0, 12) + "GMT" + d.substring(12, 15) + ":" +  d.substring(15, 17);
+            } else {
+                return d.substring(0, 12) + "GMT" + d.substring(12, 15) + ":" + d.substring(15, 17);
             }
         }
     }
@@ -199,56 +182,51 @@ public class DERUTCTime
      */
     public String getAdjustedTime()
     {
-        String   d = this.getTime();
+        String d = this.getTime();
 
-        if (d.charAt(0) < '5')
-        {
+        if (d.charAt(0) < '5') {
             return "20" + d;
-        }
-        else
-        {
+        } else {
             return "19" + d;
         }
     }
 
     private byte[] getOctets()
     {
-        char[]  cs = time.toCharArray();
-        byte[]  bs = new byte[cs.length];
+        char[] cs = time.toCharArray();
+        byte[] bs = new byte[cs.length];
 
-        for (int i = 0; i != cs.length; i++)
-        {
-            bs[i] = (byte)cs[i];
+        for (int i = 0; i != cs.length; i++) {
+            bs[i] = (byte) cs[i];
         }
 
         return bs;
     }
 
     void encode(
-        DEROutputStream  out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
         out.writeEncoded(UTC_TIME, this.getOctets());
     }
-    
+
     boolean asn1Equals(
-        DERObject  o)
+            DERObject o)
     {
-        if (!(o instanceof DERUTCTime))
-        {
+        if (!(o instanceof DERUTCTime)) {
             return false;
         }
 
-        return time.equals(((DERUTCTime)o).time);
+        return time.equals(((DERUTCTime) o).time);
     }
-    
+
     public int hashCode()
     {
         return time.hashCode();
     }
 
-    public String toString() 
+    public String toString()
     {
-      return time;
+        return time;
     }
 }

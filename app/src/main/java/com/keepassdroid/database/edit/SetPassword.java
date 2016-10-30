@@ -32,97 +32,108 @@ import com.keepassdroid.database.exception.InvalidKeyFileException;
 import com.keepassdroid.dialog.PasswordEncodingDialogHelper;
 import com.keepassdroid.utils.UriUtil;
 
-public class SetPassword extends RunnableOnFinish {
-	
-	private String mPassword;
-	private Uri mKeyfile;
-	private Database mDb;
-	private boolean mDontSave;
-	private Context ctx;
-	
-	public SetPassword(Context ctx, Database db, String password, Uri keyfile, OnFinish finish) {
-		this(ctx, db, password, keyfile, finish, false);
-		
-	}
+public class SetPassword extends RunnableOnFinish
+{
 
-	public SetPassword(Context ctx, Database db, String password, Uri keyfile, OnFinish finish, boolean dontSave) {
-		super(finish);
-		
-		mDb = db;
-		mPassword = password;
-		mKeyfile = keyfile;
-		mDontSave = dontSave;
-		this.ctx = ctx;
-	}
-	
-	public boolean validatePassword(Context ctx, DialogInterface.OnClickListener onclick) {
-		if (!mDb.pm.validatePasswordEncoding(mPassword)) {
-			PasswordEncodingDialogHelper dialog = new PasswordEncodingDialogHelper();
-			dialog.show(ctx, onclick, true);
-			return false;
-		}
-		
-		return true;
-	}
-	
-	@Override
-	public void run() {
-		PwDatabase pm = mDb.pm;
-		
-		byte[] backupKey = new byte[pm.masterKey.length];
-		System.arraycopy(pm.masterKey, 0, backupKey, 0, backupKey.length);
+    private String mPassword;
+    private Uri mKeyfile;
+    private Database mDb;
+    private boolean mDontSave;
+    private Context ctx;
 
-		// Set key
-		try {
-			InputStream is = UriUtil.getUriInputStream(ctx, mKeyfile);
-			pm.setMasterKey(mPassword, is);
-		} catch (InvalidKeyFileException e) {
-			erase(backupKey);
-			finish(false, e.getMessage());
-			return;
-		} catch (IOException e) {
-			erase(backupKey);
-			finish(false, e.getMessage());
-			return;
-		}
-		
-		// Save Database
-		mFinish = new AfterSave(backupKey, mFinish);
-		SaveDB save = new SaveDB(ctx, mDb, mFinish, mDontSave);
-		save.run();
-	}
-	
-	private class AfterSave extends OnFinish {
-		private byte[] mBackup;
-		
-		public AfterSave(byte[] backup, OnFinish finish) {
-			super(finish);
-			
-			mBackup = backup;
-		}
+    public SetPassword(Context ctx, Database db, String password, Uri keyfile, OnFinish finish)
+    {
+        this(ctx, db, password, keyfile, finish, false);
 
-		@Override
-		public void run() {
-			if ( ! mSuccess ) {
-				// Erase the current master key
-				erase(mDb.pm.masterKey);
-				mDb.pm.masterKey = mBackup;
-			}
-			
-			super.run();
-		}
+    }
 
-	}
-	
-	/** Overwrite the array as soon as we don't need it to avoid keeping the extra data in memory
-	 * @param array
-	 */
-	private void erase(byte[] array) {
-		if ( array == null ) return;
-		
-		for ( int i = 0; i < array.length; i++ ) {
-			array[i] = 0;
-		}
-	}
+    public SetPassword(Context ctx, Database db, String password, Uri keyfile, OnFinish finish, boolean dontSave)
+    {
+        super(finish);
+
+        mDb = db;
+        mPassword = password;
+        mKeyfile = keyfile;
+        mDontSave = dontSave;
+        this.ctx = ctx;
+    }
+
+    public boolean validatePassword(Context ctx, DialogInterface.OnClickListener onclick)
+    {
+        if (!mDb.pm.validatePasswordEncoding(mPassword)) {
+            PasswordEncodingDialogHelper dialog = new PasswordEncodingDialogHelper();
+            dialog.show(ctx, onclick, true);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void run()
+    {
+        PwDatabase pm = mDb.pm;
+
+        byte[] backupKey = new byte[pm.masterKey.length];
+        System.arraycopy(pm.masterKey, 0, backupKey, 0, backupKey.length);
+
+        // Set key
+        try {
+            InputStream is = UriUtil.getUriInputStream(ctx, mKeyfile);
+            pm.setMasterKey(mPassword, is);
+        } catch (InvalidKeyFileException e) {
+            erase(backupKey);
+            finish(false, e.getMessage());
+            return;
+        } catch (IOException e) {
+            erase(backupKey);
+            finish(false, e.getMessage());
+            return;
+        }
+
+        // Save Database
+        mFinish = new AfterSave(backupKey, mFinish);
+        SaveDB save = new SaveDB(ctx, mDb, mFinish, mDontSave);
+        save.run();
+    }
+
+    private class AfterSave extends OnFinish
+    {
+        private byte[] mBackup;
+
+        public AfterSave(byte[] backup, OnFinish finish)
+        {
+            super(finish);
+
+            mBackup = backup;
+        }
+
+        @Override
+        public void run()
+        {
+            if (!mSuccess) {
+                // Erase the current master key
+                erase(mDb.pm.masterKey);
+                mDb.pm.masterKey = mBackup;
+            }
+
+            super.run();
+        }
+
+    }
+
+    /**
+     * Overwrite the array as soon as we don't need it to avoid keeping the extra data in memory
+     *
+     * @param array
+     */
+    private void erase(byte[] array)
+    {
+        if (array == null) return;
+
+        for (int i = 0; i < array.length; i++) {
+            array[i] = 0;
+        }
+    }
 
 }

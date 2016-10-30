@@ -10,54 +10,50 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 public abstract class ASN1OctetString
-    extends ASN1Object
-    implements ASN1OctetStringParser
+        extends ASN1Object
+        implements ASN1OctetStringParser
 {
-    byte[]  string;
+    byte[] string;
 
     /**
      * return an Octet String from a tagged object.
      *
-     * @param obj the tagged object holding the object we want.
+     * @param obj      the tagged object holding the object we want.
      * @param explicit true if the object is meant to be explicitly
-     *              tagged false otherwise.
-     * @exception IllegalArgumentException if the tagged object cannot
-     *              be converted.
+     *                 tagged false otherwise.
+     * @throws IllegalArgumentException if the tagged object cannot
+     *                                  be converted.
      */
     public static ASN1OctetString getInstance(
-        ASN1TaggedObject    obj,
-        boolean             explicit)
+            ASN1TaggedObject obj,
+            boolean explicit)
     {
         return getInstance(obj.getObject());
     }
-    
+
     /**
      * return an Octet String from the given object.
      *
      * @param obj the object we want converted.
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     @SuppressWarnings("unchecked")
-	public static ASN1OctetString getInstance(
-        Object  obj)
+    public static ASN1OctetString getInstance(
+            Object obj)
     {
-        if (obj == null || obj instanceof ASN1OctetString)
-        {
-            return (ASN1OctetString)obj;
+        if (obj == null || obj instanceof ASN1OctetString) {
+            return (ASN1OctetString) obj;
         }
 
-        if (obj instanceof ASN1TaggedObject)
-        {
-            return getInstance(((ASN1TaggedObject)obj).getObject());
+        if (obj instanceof ASN1TaggedObject) {
+            return getInstance(((ASN1TaggedObject) obj).getObject());
         }
 
-        if (obj instanceof ASN1Sequence)
-        {
-            Vector      v = new Vector();
-            Enumeration e = ((ASN1Sequence)obj).getObjects();
+        if (obj instanceof ASN1Sequence) {
+            Vector v = new Vector();
+            Enumeration e = ((ASN1Sequence) obj).getObjects();
 
-            while (e.hasMoreElements())
-            {
+            while (e.hasMoreElements()) {
                 v.addElement(e.nextElement());
             }
 
@@ -71,24 +67,20 @@ public abstract class ASN1OctetString
      * @param string the octets making up the octet string.
      */
     public ASN1OctetString(
-        byte[]  string)
+            byte[] string)
     {
-        if (string == null)
-        {
+        if (string == null) {
             throw new NullPointerException("string cannot be null");
         }
         this.string = string;
     }
 
     public ASN1OctetString(
-        DEREncodable obj)
+            DEREncodable obj)
     {
-        try
-        {
+        try {
             this.string = obj.getDERObject().getEncoded(ASN1Encodable.DER);
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new IllegalArgumentException("Error processing object : " + e.toString());
         }
     }
@@ -114,23 +106,22 @@ public abstract class ASN1OctetString
     }
 
     boolean asn1Equals(
-        DERObject  o)
+            DERObject o)
     {
-        if (!(o instanceof ASN1OctetString))
-        {
+        if (!(o instanceof ASN1OctetString)) {
             return false;
         }
 
-        ASN1OctetString  other = (ASN1OctetString)o;
+        ASN1OctetString other = (ASN1OctetString) o;
 
         return Arrays.areEqual(string, other.string);
     }
 
     abstract void encode(DEROutputStream out)
-        throws IOException;
+            throws IOException;
 
     public String toString()
     {
-      return "#"+new String(Hex.encode(string));
+        return "#" + new String(Hex.encode(string));
     }
 }

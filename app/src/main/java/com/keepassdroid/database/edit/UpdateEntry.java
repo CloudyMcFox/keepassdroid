@@ -25,72 +25,78 @@ import com.keepassdroid.Database;
 import com.keepassdroid.database.PwEntry;
 import com.keepassdroid.database.PwGroup;
 
-public class UpdateEntry extends RunnableOnFinish {
-	private Database mDb;
-	private PwEntry mOldE;
-	private PwEntry mNewE;
-	private Context ctx;
-	
-	public UpdateEntry(Context ctx, Database db, PwEntry oldE, PwEntry newE, OnFinish finish) {
-		super(finish);
-		
-		mDb = db;
-		mOldE = oldE;
-		mNewE = newE;
-		this.ctx = ctx;
-		
-		// Keep backup of original values in case save fails
-		PwEntry backup;
-		backup = (PwEntry) mOldE.clone();
-		
-		mFinish = new AfterUpdate(backup, finish);
-	}
+public class UpdateEntry extends RunnableOnFinish
+{
+    private Database mDb;
+    private PwEntry mOldE;
+    private PwEntry mNewE;
+    private Context ctx;
 
-	@Override
-	public void run() {
-		// Update entry with new values
-		mOldE.assign(mNewE);
-		mOldE.touch(true, true);
-		
-		
-		// Commit to disk
-		SaveDB save = new SaveDB(ctx, mDb, mFinish);
-		save.run();
-	}
-	
-	private class AfterUpdate extends OnFinish {
-		private PwEntry mBackup;
-		
-		public AfterUpdate(PwEntry backup, OnFinish finish) {
-			super(finish);
-			
-			mBackup = backup;
-		}
-		
-		@Override
-		public void run() {
-			if ( mSuccess ) {
-				// Mark group dirty if title or icon changes
-				if ( ! mBackup.getTitle().equals(mNewE.getTitle()) || ! mBackup.getIcon().equals(mNewE.getIcon()) ) {
-					PwGroup parent = mBackup.getParent();
-					if ( parent != null ) {
-						// Resort entries
-						parent.sortEntriesByName();
+    public UpdateEntry(Context ctx, Database db, PwEntry oldE, PwEntry newE, OnFinish finish)
+    {
+        super(finish);
 
-						// Mark parent group dirty
-						mDb.dirty.add(parent);
-						
-					}
-				}
-			} else {
-				// If we fail to save, back out changes to global structure
-				mOldE.assign(mBackup);
-			}
-			
-			super.run();
-		}
-		
-	}
+        mDb = db;
+        mOldE = oldE;
+        mNewE = newE;
+        this.ctx = ctx;
+
+        // Keep backup of original values in case save fails
+        PwEntry backup;
+        backup = (PwEntry) mOldE.clone();
+
+        mFinish = new AfterUpdate(backup, finish);
+    }
+
+    @Override
+    public void run()
+    {
+        // Update entry with new values
+        mOldE.assign(mNewE);
+        mOldE.touch(true, true);
+
+
+        // Commit to disk
+        SaveDB save = new SaveDB(ctx, mDb, mFinish);
+        save.run();
+    }
+
+    private class AfterUpdate extends OnFinish
+    {
+        private PwEntry mBackup;
+
+        public AfterUpdate(PwEntry backup, OnFinish finish)
+        {
+            super(finish);
+
+            mBackup = backup;
+        }
+
+        @Override
+        public void run()
+        {
+            if (mSuccess) {
+                // Mark group dirty if title or icon changes
+                if (!mBackup.getTitle().equals(mNewE.getTitle()) || !mBackup.getIcon().equals(mNewE.getIcon())) {
+                    PwGroup parent = mBackup.getParent();
+                    if (parent != null) {
+                        // Resort entries
+                        parent.sortEntriesByName();
+
+                        // Mark parent group dirty
+                        mDb.dirty.add(parent);
+
+                    }
+                }
+            } else {
+                // If we fail to save, back out changes to global structure
+                mOldE.assign(mBackup);
+            }
+
+            super.run();
+        }
+
+    }
 
 
 }

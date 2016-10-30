@@ -4,8 +4,8 @@ package org.bouncycastle.crypto;
  * the foundation class for the exceptions thrown by the crypto packages.
  */
 @SuppressWarnings("serial")
-public class RuntimeCryptoException 
-    extends RuntimeException
+public class RuntimeCryptoException
+        extends RuntimeException
 {
     /**
      * base constructor.
@@ -20,7 +20,7 @@ public class RuntimeCryptoException
      * @param message the message to be carried with the exception.
      */
     public RuntimeCryptoException(
-        String  message)
+            String message)
     {
         super(message);
     }

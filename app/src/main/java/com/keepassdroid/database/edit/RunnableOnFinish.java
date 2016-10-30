@@ -22,32 +22,37 @@ package com.keepassdroid.database.edit;
 import com.keepassdroid.UpdateStatus;
 
 
-public abstract class RunnableOnFinish implements Runnable {
-	
-	public OnFinish mFinish;
-	public UpdateStatus mStatus;
-	
-	public RunnableOnFinish(OnFinish finish) {
-		mFinish = finish;
-	}
-	
-	protected void finish(boolean result, String message) {
-		if ( mFinish != null ) {
-			mFinish.setResult(result, message);
-			mFinish.run();
-		}
-	}
-	
-	protected void finish(boolean result) {
-		if ( mFinish != null ) {
-			mFinish.setResult(result);
-			mFinish.run();
-		}
-	}
-	
-	public void setStatus(UpdateStatus status) {
-		mStatus = status;
-	}
-	
-	abstract public void run();
+public abstract class RunnableOnFinish implements Runnable
+{
+
+    public OnFinish mFinish;
+    public UpdateStatus mStatus;
+
+    public RunnableOnFinish(OnFinish finish)
+    {
+        mFinish = finish;
+    }
+
+    protected void finish(boolean result, String message)
+    {
+        if (mFinish != null) {
+            mFinish.setResult(result, message);
+            mFinish.run();
+        }
+    }
+
+    protected void finish(boolean result)
+    {
+        if (mFinish != null) {
+            mFinish.setResult(result);
+            mFinish.run();
+        }
+    }
+
+    public void setStatus(UpdateStatus status)
+    {
+        mStatus = status;
+    }
+
+    abstract public void run();
 }

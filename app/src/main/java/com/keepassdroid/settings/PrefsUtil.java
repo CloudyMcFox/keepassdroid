@@ -25,10 +25,12 @@ import android.preference.PreferenceManager;
 
 import com.android.keepass.R;
 
-public class PrefsUtil {
-	public static float getListTextSize(Context ctx) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-		return Float.parseFloat(prefs.getString(ctx.getString(R.string.list_size_key), ctx.getString(R.string.list_size_default)));
+public class PrefsUtil
+{
+    public static float getListTextSize(Context ctx)
+    {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        return Float.parseFloat(prefs.getString(ctx.getString(R.string.list_size_key), ctx.getString(R.string.list_size_default)));
 
-	}
+    }
 }

@@ -9,43 +9,41 @@ import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 
 public class Attribute
-    extends ASN1Encodable
+        extends ASN1Encodable
 {
     private DERObjectIdentifier attrType;
-    private ASN1Set             attrValues;
+    private ASN1Set attrValues;
 
     /**
      * return an Attribute object from the given object.
      *
      * @param o the object we want converted.
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static Attribute getInstance(
-        Object o)
+            Object o)
     {
-        if (o == null || o instanceof Attribute)
-        {
-            return (Attribute)o;
+        if (o == null || o instanceof Attribute) {
+            return (Attribute) o;
         }
-        
-        if (o instanceof ASN1Sequence)
-        {
-            return new Attribute((ASN1Sequence)o);
+
+        if (o instanceof ASN1Sequence) {
+            return new Attribute((ASN1Sequence) o);
         }
 
         throw new IllegalArgumentException("unknown object in factory: " + o.getClass().getName());
     }
-    
+
     public Attribute(
-        ASN1Sequence seq)
+            ASN1Sequence seq)
     {
-        attrType = (DERObjectIdentifier)seq.getObjectAt(0);
-        attrValues = (ASN1Set)seq.getObjectAt(1);
+        attrType = (DERObjectIdentifier) seq.getObjectAt(0);
+        attrValues = (ASN1Set) seq.getObjectAt(1);
     }
 
     public Attribute(
-        DERObjectIdentifier attrType,
-        ASN1Set             attrValues)
+            DERObjectIdentifier attrType,
+            ASN1Set attrValues)
     {
         this.attrType = attrType;
         this.attrValues = attrValues;
@@ -55,13 +53,13 @@ public class Attribute
     {
         return attrType;
     }
-    
+
     public ASN1Set getAttrValues()
     {
         return attrValues;
     }
 
-    /** 
+    /**
      * Produce an object suitable for an ASN1OutputStream.
      * <pre>
      * Attribute ::= SEQUENCE {

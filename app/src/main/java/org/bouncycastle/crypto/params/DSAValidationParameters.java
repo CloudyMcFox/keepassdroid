@@ -4,12 +4,12 @@ import org.bouncycastle.util.Arrays;
 
 public class DSAValidationParameters
 {
-    private byte[]  seed;
-    private int     counter;
+    private byte[] seed;
+    private int counter;
 
     public DSAValidationParameters(
-        byte[]  seed,
-        int     counter)
+            byte[] seed,
+            int counter)
     {
         this.seed = seed;
         this.counter = counter;
@@ -29,19 +29,17 @@ public class DSAValidationParameters
     {
         return counter ^ Arrays.hashCode(seed);
     }
-    
+
     public boolean equals(
-        Object o)
+            Object o)
     {
-        if (!(o instanceof DSAValidationParameters))
-        {
+        if (!(o instanceof DSAValidationParameters)) {
             return false;
         }
 
-        DSAValidationParameters  other = (DSAValidationParameters)o;
+        DSAValidationParameters other = (DSAValidationParameters) o;
 
-        if (other.counter != this.counter)
-        {
+        if (other.counter != this.counter) {
             return false;
         }
 

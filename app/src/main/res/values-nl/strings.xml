@@ -30,7 +30,7 @@
     <string name="add_group_title">Groep toevoegen</string>
     <string name="algorithm">Algoritme</string>
     <string name="algorithm_colon">Algoritme:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Applicatietimeout</string>
     <string name="app_timeout_summary">Tijd tot het vergrendelen van de database bij inactiviteit.</string>
     <string name="application">Applicatie</string>

@@ -24,7 +24,8 @@ import android.net.Uri;
 
 import java.lang.reflect.Method;
 
-public class ClipDataCompat {
+public class ClipDataCompat
+{
     private static Class clipData;
     private static Class clipDataItem;
     private static Class clipDescription;
@@ -40,16 +41,16 @@ public class ClipDataCompat {
     static {
         try {
             clipData = Class.forName("android.content.ClipData");
-            getDescription = clipData.getMethod("getDescription", (Class[])null);
-            getItemCount = clipData.getMethod("getItemCount", (Class[])null);
+            getDescription = clipData.getMethod("getDescription", (Class[]) null);
+            getItemCount = clipData.getMethod("getItemCount", (Class[]) null);
             getItemAt = clipData.getMethod("getItemAt", new Class[]{int.class});
             clipDescription = Class.forName("android.content.ClipDescription");
-            getLabel = clipDescription.getMethod("getLabel", (Class[])null);
+            getLabel = clipDescription.getMethod("getLabel", (Class[]) null);
 
             clipDataItem = Class.forName("android.content.ClipData$Item");
-            getUri = clipDataItem.getMethod("getUri", (Class[])null);
+            getUri = clipDataItem.getMethod("getUri", (Class[]) null);
 
-            getClipDataFromIntent = Intent.class.getMethod("getClipData", (Class[])null);
+            getClipDataFromIntent = Intent.class.getMethod("getClipData", (Class[]) null);
 
         } catch (Exception e) {
             initSucceded = false;
@@ -58,7 +59,8 @@ public class ClipDataCompat {
         initSucceded = true;
     }
 
-    public static Uri getUriFromIntent(Intent i, String key) {
+    public static Uri getUriFromIntent(Intent i, String key)
+    {
         boolean clipDataSucceeded = false;
         if (initSucceded) {
             try {
@@ -66,13 +68,13 @@ public class ClipDataCompat {
 
                 if (clip != null) {
                     Object clipDescription = getDescription.invoke(clip, null);
-                    CharSequence label = (CharSequence)getLabel.invoke(clipDescription, null);
+                    CharSequence label = (CharSequence) getLabel.invoke(clipDescription, null);
                     if (label.equals(key)) {
                         int itemCount = (int) getItemCount.invoke(clip, null);
                         if (itemCount == 1) {
-                            Object clipItem = getItemAt.invoke(clip,0);
+                            Object clipItem = getItemAt.invoke(clip, 0);
                             if (clipItem != null) {
-                                return (Uri)getUri.invoke(clipItem, null);
+                                return (Uri) getUri.invoke(clipItem, null);
                             }
                         }
                     }

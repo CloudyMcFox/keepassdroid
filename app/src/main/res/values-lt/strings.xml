@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="AboutText">KeePassDroid yra KeePass slaptažodžių tvarkyklės realizacija Android platformai</string>
     <string name="ClearClipboard">Iškarpinė išvalyta.</string>
     <string name="FileNotFound">Failas nerastas.</string>

@@ -27,26 +27,30 @@ import android.widget.RelativeLayout;
 
 import com.android.keepass.R;
 
-public class GroupRootView extends RelativeLayout {
+public class GroupRootView extends RelativeLayout
+{
 
-	public GroupRootView(Context context) {
-		this(context, null);
-	}
-	
-	public GroupRootView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		
-		inflate(context);
-	}
-	
-	private void inflate(Context context) {
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflater.inflate(R.layout.group_add_entry, this);
-		
-		Button addEntry = (Button) findViewById(R.id.add_entry);
-		addEntry.setVisibility(INVISIBLE);
-		
-	}
+    public GroupRootView(Context context)
+    {
+        this(context, null);
+    }
+
+    public GroupRootView(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+
+        inflate(context);
+    }
+
+    private void inflate(Context context)
+    {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.group_add_entry, this);
+
+        Button addEntry = (Button) findViewById(R.id.add_entry);
+        addEntry.setVisibility(INVISIBLE);
+
+    }
 
 
 }

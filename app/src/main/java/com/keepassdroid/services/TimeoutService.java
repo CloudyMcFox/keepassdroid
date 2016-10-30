@@ -32,68 +32,78 @@ import android.util.Log;
 import com.keepassdroid.app.App;
 import com.keepassdroid.intents.Intents;
 
-public class TimeoutService extends Service {
-	private static final String TAG = "KeePassDroid Timer"; 
-	private BroadcastReceiver mIntentReceiver;
-	
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		
-		mIntentReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				String action = intent.getAction();
-				
-				if ( action.equals(Intents.TIMEOUT) ) {
-					timeout(context);
-				}
-			}
-		};
-		
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(Intents.TIMEOUT);
-		registerReceiver(mIntentReceiver, filter);
-		
-	}
-	
-	@Override
-	public void onStart(Intent intent, int startId) {
-		super.onStart(intent, startId);
-		
-		Log.d(TAG, "Timeout service started");
-	}
+public class TimeoutService extends Service
+{
+    private static final String TAG = "KeePassDroid Timer";
+    private BroadcastReceiver mIntentReceiver;
 
-	private void timeout(Context context) {
-		Log.d(TAG, "Timeout");
-		App.setShutdown();
-		
-		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		nm.cancelAll();
-		
-		stopSelf();
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
 
-		Log.d(TAG, "Timeout service stopped");
-	
-		unregisterReceiver(mIntentReceiver);
-	}
+        mIntentReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String action = intent.getAction();
 
-	public class TimeoutBinder extends Binder {
-		public TimeoutService getService() {
-			return TimeoutService.this;
-		}
-	}
-	
-	private final IBinder mBinder = new TimeoutBinder();
-	
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mBinder;
-	}
-	
+                if (action.equals(Intents.TIMEOUT)) {
+                    timeout(context);
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intents.TIMEOUT);
+        registerReceiver(mIntentReceiver, filter);
+
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId)
+    {
+        super.onStart(intent, startId);
+
+        Log.d(TAG, "Timeout service started");
+    }
+
+    private void timeout(Context context)
+    {
+        Log.d(TAG, "Timeout");
+        App.setShutdown();
+
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        nm.cancelAll();
+
+        stopSelf();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        Log.d(TAG, "Timeout service stopped");
+
+        unregisterReceiver(mIntentReceiver);
+    }
+
+    public class TimeoutBinder extends Binder
+    {
+        public TimeoutService getService()
+        {
+            return TimeoutService.this;
+        }
+    }
+
+    private final IBinder mBinder = new TimeoutBinder();
+
+    @Override
+    public IBinder onBind(Intent intent)
+    {
+        return mBinder;
+    }
+
 }

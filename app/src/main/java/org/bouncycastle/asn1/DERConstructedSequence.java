@@ -9,10 +9,10 @@ import java.util.Enumeration;
  */
 @SuppressWarnings("unchecked")
 public class DERConstructedSequence
-    extends ASN1Sequence
+        extends ASN1Sequence
 {
     public void addObject(
-        DEREncodable obj)
+            DEREncodable obj)
     {
         super.addObject(obj);
     }
@@ -31,23 +31,22 @@ public class DERConstructedSequence
      * we also have to specify CONSTRUCTED, and the objects length.
      */
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
-        ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
-        DEROutputStream         dOut = new DEROutputStream(bOut);
-        Enumeration             e = this.getObjects();
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        DEROutputStream dOut = new DEROutputStream(bOut);
+        Enumeration e = this.getObjects();
 
-        while (e.hasMoreElements())
-        {
-            Object    obj = e.nextElement();
+        while (e.hasMoreElements()) {
+            Object obj = e.nextElement();
 
             dOut.writeObject(obj);
         }
 
         dOut.close();
 
-        byte[]  bytes = bOut.toByteArray();
+        byte[] bytes = bOut.toByteArray();
 
         out.writeEncoded(SEQUENCE | CONSTRUCTED, bytes);
     }

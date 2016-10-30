@@ -14,5 +14,5 @@ public interface Wrapper
     public byte[] wrap(byte[] in, int inOff, int inLen);
 
     public byte[] unwrap(byte[] in, int inOff, int inLen)
-        throws InvalidCipherTextException;
+            throws InvalidCipherTextException;
 }

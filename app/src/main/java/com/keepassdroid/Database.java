@@ -52,7 +52,8 @@ import com.keepassdroid.utils.UriUtil;
 /**
  * @author bpellin
  */
-public class Database {
+public class Database
+{
     public Set<PwGroup> dirty = new HashSet<PwGroup>();
     public PwDatabase pm;
     public Uri mUri;
@@ -64,27 +65,33 @@ public class Database {
 
     private boolean loaded = false;
 
-    public boolean Loaded() {
+    public boolean Loaded()
+    {
         return loaded;
     }
 
-    public void setLoaded() {
+    public void setLoaded()
+    {
         loaded = true;
     }
 
-    public void LoadData(Context ctx, InputStream is, String password, InputStream keyInputStream) throws IOException, InvalidDBException {
+    public void LoadData(Context ctx, InputStream is, String password, InputStream keyInputStream) throws IOException, InvalidDBException
+    {
         LoadData(ctx, is, password, keyInputStream, new UpdateStatus(), !Importer.DEBUG);
     }
 
-    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile) throws IOException, FileNotFoundException, InvalidDBException {
+    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile) throws IOException, FileNotFoundException, InvalidDBException
+    {
         LoadData(ctx, uri, password, keyfile, new UpdateStatus(), !Importer.DEBUG);
     }
 
-    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile, UpdateStatus status) throws IOException, FileNotFoundException, InvalidDBException {
+    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile, UpdateStatus status) throws IOException, FileNotFoundException, InvalidDBException
+    {
         LoadData(ctx, uri, password, keyfile, status, !Importer.DEBUG);
     }
 
-    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile, UpdateStatus status, boolean debug) throws IOException, FileNotFoundException, InvalidDBException {
+    public void LoadData(Context ctx, Uri uri, String password, Uri keyfile, UpdateStatus status, boolean debug) throws IOException, FileNotFoundException, InvalidDBException
+    {
         mUri = uri;
         readOnly = false;
         if (uri.getScheme().equals("file")) {
@@ -110,15 +117,17 @@ public class Database {
 
     }
 
-    public void LoadData(Context ctx, InputStream is, String password, InputStream kfIs, boolean debug) throws IOException, InvalidDBException {
+    public void LoadData(Context ctx, InputStream is, String password, InputStream kfIs, boolean debug) throws IOException, InvalidDBException
+    {
         LoadData(ctx, is, password, kfIs, new UpdateStatus(), debug);
     }
 
-    public void LoadData(Context ctx, InputStream is, String password, InputStream kfIs, UpdateStatus status, boolean debug) throws IOException, InvalidDBException {
+    public void LoadData(Context ctx, InputStream is, String password, InputStream kfIs, UpdateStatus status, boolean debug) throws IOException, InvalidDBException
+    {
 
         BufferedInputStream bis = new BufferedInputStream(is);
 
-        if ( ! bis.markSupported() ) {
+        if (!bis.markSupported()) {
             throw new IOException("Input stream does not support mark.");
         }
 
@@ -130,7 +139,7 @@ public class Database {
         bis.reset();  // Return to the start
 
         pm = imp.openDatabase(bis, password, kfIs, status);
-        if ( pm != null ) {
+        if (pm != null) {
             PwGroup root = pm.rootGroup;
 
             pm.populateGlobals(root);
@@ -141,8 +150,9 @@ public class Database {
         loaded = true;
     }
 
-    public void LoadData(Context ctx, PwDatabase pm, String password, InputStream keyInputStream, UpdateStatus status) {
-        if ( pm != null ) {
+    public void LoadData(Context ctx, PwDatabase pm, String password, InputStream keyInputStream, UpdateStatus status)
+    {
+        if (pm != null) {
             passwordEncodingError = !pm.validatePasswordEncoding(password);
         }
 
@@ -151,8 +161,11 @@ public class Database {
         loaded = true;
     }
 
-    public PwGroup Search(String str) {
-        if (searchHelper == null) { return null; }
+    public PwGroup Search(String str)
+    {
+        if (searchHelper == null) {
+            return null;
+        }
 
         PwGroup group = searchHelper.search(this, str);
 
@@ -160,11 +173,13 @@ public class Database {
 
     }
 
-    public void SaveData(Context ctx) throws IOException, PwDbOutputException {
+    public void SaveData(Context ctx) throws IOException, PwDbOutputException
+    {
         SaveData(ctx, mUri);
     }
 
-    public void SaveData(Context ctx, Uri uri) throws IOException, PwDbOutputException {
+    public void SaveData(Context ctx, Uri uri) throws IOException, PwDbOutputException
+    {
         if (uri.getScheme().equals("file")) {
             String filename = uri.getPath();
             File tempFile = new File(filename + ".tmp");
@@ -190,8 +205,7 @@ public class Database {
             if (!tempFile.renameTo(orig)) {
                 throw new IOException("Failed to store database.");
             }
-        }
-        else {
+        } else {
             OutputStream os;
             try {
                 os = ctx.getContentResolver().openOutputStream(uri);
@@ -208,7 +222,8 @@ public class Database {
 
     }
 
-    public void clear() {
+    public void clear()
+    {
         dirty.clear();
         drawFactory.clear();
 
@@ -218,14 +233,15 @@ public class Database {
         passwordEncodingError = false;
     }
 
-    public void markAllGroupsAsDirty() {
-        for ( PwGroup group : pm.getGroups() ) {
+    public void markAllGroupsAsDirty()
+    {
+        for (PwGroup group : pm.getGroups()) {
             dirty.add(group);
         }
 
         // TODO: This should probably be abstracted out
         // The root group in v3 is not an 'official' group
-        if ( pm instanceof PwDatabaseV3 ) {
+        if (pm instanceof PwDatabaseV3) {
             dirty.add(pm.rootGroup);
         }
     }

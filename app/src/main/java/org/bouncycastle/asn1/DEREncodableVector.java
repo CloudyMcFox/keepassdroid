@@ -19,17 +19,17 @@ public class DEREncodableVector
     {
 
     }
-    
+
     public void add(
-        DEREncodable   obj)
+            DEREncodable obj)
     {
         v.addElement(obj);
     }
 
     public DEREncodable get(
-        int i)
+            int i)
     {
-        return (DEREncodable)v.elementAt(i);
+        return (DEREncodable) v.elementAt(i);
     }
 
     public int size()

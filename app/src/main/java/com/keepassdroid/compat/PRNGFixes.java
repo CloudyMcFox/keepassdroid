@@ -35,88 +35,96 @@ import android.os.Build;
 
 /**
  * Fixes for the output of the default PRNG having low entropy.
- *
+ * <p>
  * The fixes need to be applied via {@link #apply()} before any use of Java
  * Cryptography Architecture primitives. A good place to invoke them is in the
  * application's {@code onCreate}.
  */
-public final class PRNGFixes {
+public final class PRNGFixes
+{
 
     private static final byte[] BUILD_FINGERPRINT_AND_DEVICE_SERIAL =
-        getBuildFingerprintAndDeviceSerial();
+            getBuildFingerprintAndDeviceSerial();
     private static int sdkVersion = BuildCompat.getSdkVersion();
 
-    /** Hidden constructor to prevent instantiation. */
-    private PRNGFixes() {}
-    
+    /**
+     * Hidden constructor to prevent instantiation.
+     */
+    private PRNGFixes()
+    {
+    }
+
     /**
      * Applies all fixes.
      *
      * @throws SecurityException if a fix is needed but could not be applied.
      */
-    public static void apply() {
-    	try {
-	    	if (supportedOnThisDevice()) {
-		        applyOpenSSLFix();
-		        installLinuxPRNGSecureRandom();
-	    	}
-    	} catch (Exception e) {
-    		// Do nothing, do the best we can to implement the workaround
-    	}
+    public static void apply()
+    {
+        try {
+            if (supportedOnThisDevice()) {
+                applyOpenSSLFix();
+                installLinuxPRNGSecureRandom();
+            }
+        } catch (Exception e) {
+            // Do nothing, do the best we can to implement the workaround
+        }
     }
-    
-    private static boolean supportedOnThisDevice() {
-    	// Blacklist on samsung devices
-    	if (StrUtil.indexOfIgnoreCase(BuildCompat.getManufacturer(), "samsung", Locale.ENGLISH) >= 0) {
-    		return false;
-    	}
-    	
+
+    private static boolean supportedOnThisDevice()
+    {
+        // Blacklist on samsung devices
+        if (StrUtil.indexOfIgnoreCase(BuildCompat.getManufacturer(), "samsung", Locale.ENGLISH) >= 0) {
+            return false;
+        }
+
         if (sdkVersion > BuildCompat.VERSION_CODE_JELLY_BEAN_MR2) {
             return false;
         }
-        
+
         if (onSELinuxEnforce()) {
-        	return false;
+            return false;
         }
 
-    	File urandom = new File("/dev/urandom");
-    	
-    	// Test permissions
-    	if ( !(urandom.canRead() && urandom.canWrite()) ) {
-    		return false;
-    	}
-    	
-    	
-    	// Test actually writing to urandom
-    	try {
-	    	FileOutputStream fos = new FileOutputStream(urandom);
-	    	fos.write(0);
-    	} catch (Exception e) {
-    		return false;
-    	}
-    	
-    	return true;
-    	
+        File urandom = new File("/dev/urandom");
+
+        // Test permissions
+        if (!(urandom.canRead() && urandom.canWrite())) {
+            return false;
+        }
+
+
+        // Test actually writing to urandom
+        try {
+            FileOutputStream fos = new FileOutputStream(urandom);
+            fos.write(0);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+
     }
-    
-    private static boolean onSELinuxEnforce() {
-    	try {
-	    	ProcessBuilder builder = new ProcessBuilder("getenforce");
-	    	builder.redirectErrorStream(true);
-	    	java.lang.Process process = builder.start();
-	    	BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-	    	process.waitFor();
-	    	
-	    	String output = reader.readLine();
-	    	
-	    	if (output == null) {
-	    		return false;
-	    	}
-	    	
-	    	return output.toLowerCase(Locale.US).startsWith("enforcing");
-    	} catch (Exception e) {
-    		return false;
-    	}
+
+    private static boolean onSELinuxEnforce()
+    {
+        try {
+            ProcessBuilder builder = new ProcessBuilder("getenforce");
+            builder.redirectErrorStream(true);
+            java.lang.Process process = builder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            process.waitFor();
+
+            String output = reader.readLine();
+
+            if (output == null) {
+                return false;
+            }
+
+            return output.toLowerCase(Locale.US).startsWith("enforcing");
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -125,7 +133,8 @@ public final class PRNGFixes {
      *
      * @throws SecurityException if the fix is needed but could not be applied.
      */
-    private static void applyOpenSSLFix() throws SecurityException {
+    private static void applyOpenSSLFix() throws SecurityException
+    {
         if ((sdkVersion < BuildCompat.VERSION_CODE_JELLY_BEAN)
                 || (sdkVersion > BuildCompat.VERSION_CODE_JELLY_BEAN_MR2)) {
             // No need to apply the fix
@@ -161,7 +170,8 @@ public final class PRNGFixes {
      * @throws SecurityException if the fix is needed but could not be applied.
      */
     private static void installLinuxPRNGSecureRandom()
-            throws SecurityException {
+            throws SecurityException
+    {
         if (sdkVersion > BuildCompat.VERSION_CODE_JELLY_BEAN_MR2) {
             // No need to apply the fix
             return;
@@ -174,7 +184,7 @@ public final class PRNGFixes {
         if ((secureRandomProviders == null)
                 || (secureRandomProviders.length < 1)
                 || (!LinuxPRNGSecureRandomProvider.class.equals(
-                        secureRandomProviders[0].getClass()))) {
+                secureRandomProviders[0].getClass()))) {
             Security.insertProviderAt(new LinuxPRNGSecureRandomProvider(), 1);
         }
 
@@ -199,7 +209,7 @@ public final class PRNGFixes {
                 rng2.getProvider().getClass())) {
             throw new SecurityException(
                     "SecureRandom.getInstance(\"SHA1PRNG\") backed by wrong"
-                    + " Provider: " + rng2.getProvider().getClass());
+                            + " Provider: " + rng2.getProvider().getClass());
         }
     }
 
@@ -207,13 +217,15 @@ public final class PRNGFixes {
      * {@code Provider} of {@code SecureRandom} engines which pass through
      * all requests to the Linux PRNG.
      */
-    private static class LinuxPRNGSecureRandomProvider extends Provider {
+    private static class LinuxPRNGSecureRandomProvider extends Provider
+    {
 
-        public LinuxPRNGSecureRandomProvider() {
+        public LinuxPRNGSecureRandomProvider()
+        {
             super("LinuxPRNG",
                     1.0,
                     "A Linux-specific random number provider that uses"
-                        + " /dev/urandom");
+                            + " /dev/urandom");
             // Although /dev/urandom is not a SHA-1 PRNG, some apps
             // explicitly request a SHA1PRNG SecureRandom and we thus need to
             // prevent them from getting the default implementation whose output
@@ -227,7 +239,8 @@ public final class PRNGFixes {
      * {@link SecureRandomSpi} which passes all requests to the Linux PRNG
      * ({@code /dev/urandom}).
      */
-    public static class LinuxPRNGSecureRandom extends SecureRandomSpi {
+    public static class LinuxPRNGSecureRandom extends SecureRandomSpi
+    {
 
         /*
          * IMPLEMENTATION NOTE: Requests to generate bytes and to mix in a seed
@@ -242,7 +255,7 @@ public final class PRNGFixes {
          */
 
         private static final File URANDOM_FILE = new File("/dev/urandom");
-        
+
 
         private static final Object sLock = new Object();
 
@@ -270,7 +283,8 @@ public final class PRNGFixes {
         private boolean mSeeded;
 
         @Override
-        protected void engineSetSeed(byte[] bytes) {
+        protected void engineSetSeed(byte[] bytes)
+        {
             try {
                 OutputStream out;
                 synchronized (sLock) {
@@ -286,7 +300,8 @@ public final class PRNGFixes {
         }
 
         @Override
-        protected void engineNextBytes(byte[] bytes) {
+        protected void engineNextBytes(byte[] bytes)
+        {
             if (!mSeeded) {
                 // Mix in the device- and invocation-specific seed.
                 engineSetSeed(generateSeed());
@@ -307,13 +322,15 @@ public final class PRNGFixes {
         }
 
         @Override
-        protected byte[] engineGenerateSeed(int size) {
+        protected byte[] engineGenerateSeed(int size)
+        {
             byte[] seed = new byte[size];
             engineNextBytes(seed);
             return seed;
         }
 
-        private DataInputStream getUrandomInputStream() {
+        private DataInputStream getUrandomInputStream()
+        {
             synchronized (sLock) {
                 if (sUrandomIn == null) {
                     // NOTE: Consider inserting a BufferedInputStream between
@@ -332,7 +349,8 @@ public final class PRNGFixes {
             }
         }
 
-        private OutputStream getUrandomOutputStream() {
+        private OutputStream getUrandomOutputStream()
+        {
             synchronized (sLock) {
                 if (sUrandomOut == null) {
                     try {
@@ -351,7 +369,8 @@ public final class PRNGFixes {
      * Generates a device- and invocation-specific seed to be mixed into the
      * Linux PRNG.
      */
-    private static byte[] generateSeed() {
+    private static byte[] generateSeed()
+    {
         try {
             ByteArrayOutputStream seedBuffer = new ByteArrayOutputStream();
             DataOutputStream seedBufferOut =
@@ -373,7 +392,8 @@ public final class PRNGFixes {
      *
      * @return serial number or {@code null} if not available.
      */
-    private static String getDeviceSerialNumber() {
+    private static String getDeviceSerialNumber()
+    {
         // We're using the Reflection API because Build.SERIAL is only available
         // since API Level 9 (Gingerbread, Android 2.3).
         try {
@@ -383,7 +403,8 @@ public final class PRNGFixes {
         }
     }
 
-    private static byte[] getBuildFingerprintAndDeviceSerial() {
+    private static byte[] getBuildFingerprintAndDeviceSerial()
+    {
         StringBuilder result = new StringBuilder();
         String fingerprint = Build.FINGERPRINT;
         if (fingerprint != null) {

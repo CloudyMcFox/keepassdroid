@@ -5,10 +5,10 @@ import java.io.IOException;
 
 @SuppressWarnings("unchecked")
 class LazyDERConstructionEnumeration
-    implements Enumeration
+        implements Enumeration
 {
     private ASN1InputStream aIn;
-    private Object          nextObj;
+    private Object nextObj;
 
     public LazyDERConstructionEnumeration(byte[] encoded)
     {
@@ -32,12 +32,9 @@ class LazyDERConstructionEnumeration
 
     private Object readObject()
     {
-        try
-        {
+        try {
             return aIn.readObject();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             throw new ASN1ParsingException("malformed DER construction: " + e, e);
         }
     }

@@ -26,18 +26,21 @@ import com.keepassdroid.UpdateStatus;
 import com.keepassdroid.database.PwDatabaseV4Debug;
 import com.keepassdroid.database.exception.InvalidDBException;
 
-public class ImporterV4Debug extends ImporterV4 {
+public class ImporterV4Debug extends ImporterV4
+{
 
-	@Override
-	protected PwDatabaseV4Debug createDB() {
-		return new PwDatabaseV4Debug();
-	}
+    @Override
+    protected PwDatabaseV4Debug createDB()
+    {
+        return new PwDatabaseV4Debug();
+    }
 
-	@Override
-	public PwDatabaseV4Debug openDatabase(InputStream inStream, String password,
-			InputStream keyInputFile, UpdateStatus status) throws IOException,
-			InvalidDBException {
-		return (PwDatabaseV4Debug) super.openDatabase(inStream, password, keyInputFile, status);
-	}
+    @Override
+    public PwDatabaseV4Debug openDatabase(InputStream inStream, String password,
+                                          InputStream keyInputFile, UpdateStatus status) throws IOException,
+            InvalidDBException
+    {
+        return (PwDatabaseV4Debug) super.openDatabase(inStream, password, keyInputFile, status);
+    }
 
 }

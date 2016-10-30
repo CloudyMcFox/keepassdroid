@@ -21,12 +21,14 @@ package com.keepassdroid;
 
 import com.keepassdroid.timeout.TimeoutHelper;
 
-public abstract class LockCloseListActivity extends LockingListActivity {
+public abstract class LockCloseListActivity extends LockingListActivity
+{
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
 
-		TimeoutHelper.checkShutdown(this);
-	}
+        TimeoutHelper.checkShutdown(this);
+    }
 }

@@ -7,44 +7,42 @@ import java.io.InputStream;
 public class ASN1StreamParser
 {
     private final InputStream _in;
-    private final int         _limit;
+    private final int _limit;
 
     private static int findLimit(InputStream in)
     {
-        if (in instanceof DefiniteLengthInputStream)
-        {
-            return ((DefiniteLengthInputStream)in).getRemaining();
+        if (in instanceof DefiniteLengthInputStream) {
+            return ((DefiniteLengthInputStream) in).getRemaining();
         }
 
         return Integer.MAX_VALUE;
     }
 
     public ASN1StreamParser(
-        InputStream in)
+            InputStream in)
     {
         this(in, findLimit(in));
     }
 
     public ASN1StreamParser(
-        InputStream in,
-        int         limit)
+            InputStream in,
+            int limit)
     {
         this._in = in;
         this._limit = limit;
     }
 
     public ASN1StreamParser(
-        byte[] encoding)
+            byte[] encoding)
     {
         this(new ByteArrayInputStream(encoding), encoding.length);
     }
 
     public DEREncodable readObject()
-        throws IOException
+            throws IOException
     {
         int tag = _in.read();
-        if (tag == -1)
-        {
+        if (tag == -1) {
             return null;
         }
 
@@ -67,62 +65,52 @@ public class ASN1StreamParser
 
         if (length < 0) // indefinite length method
         {
-            if (!isConstructed)
-            {
+            if (!isConstructed) {
                 throw new IOException("indefinite length primitive encoding encountered");
             }
 
             IndefiniteLengthInputStream indIn = new IndefiniteLengthInputStream(_in);
 
-            if ((tag & DERTags.APPLICATION) != 0)
-            {
+            if ((tag & DERTags.APPLICATION) != 0) {
                 ASN1StreamParser sp = new ASN1StreamParser(indIn, _limit);
 
                 return new BERApplicationSpecificParser(tagNo, sp);
             }
 
-            if ((tag & DERTags.TAGGED) != 0)
-            {
+            if ((tag & DERTags.TAGGED) != 0) {
                 return new BERTaggedObjectParser(tag, tagNo, indIn);
             }
 
             ASN1StreamParser sp = new ASN1StreamParser(indIn, _limit);
 
             // TODO There are other tags that may be constructed (e.g. BIT_STRING)
-            switch (tagNo)
-            {
+            switch (tagNo) {
                 case DERTags.OCTET_STRING:
                     return new BEROctetStringParser(sp);
                 case DERTags.SEQUENCE:
                     return new BERSequenceParser(sp);
                 case DERTags.SET:
                     return new BERSetParser(sp);
-                case DERTags.EXTERNAL:{
+                case DERTags.EXTERNAL: {
                     return new DERExternalParser(sp);
                 }
                 default:
                     throw new IOException("unknown BER object encountered: 0x" + Integer.toHexString(tagNo));
             }
-        }
-        else
-        {
+        } else {
             DefiniteLengthInputStream defIn = new DefiniteLengthInputStream(_in, length);
 
-            if ((tag & DERTags.APPLICATION) != 0)
-            {
+            if ((tag & DERTags.APPLICATION) != 0) {
                 return new DERApplicationSpecific(isConstructed, tagNo, defIn.toByteArray());
             }
 
-            if ((tag & DERTags.TAGGED) != 0)
-            {
+            if ((tag & DERTags.TAGGED) != 0) {
                 return new BERTaggedObjectParser(tag, tagNo, defIn);
             }
 
-            if (isConstructed)
-            {
+            if (isConstructed) {
                 // TODO There are other tags that may be constructed (e.g. BIT_STRING)
-                switch (tagNo)
-                {
+                switch (tagNo) {
                     case DERTags.OCTET_STRING:
                         //
                         // yes, people actually do this...
@@ -141,8 +129,7 @@ public class ASN1StreamParser
             }
 
             // Some primitive encodings can be handled by parsers too...
-            switch (tagNo)
-            {
+            switch (tagNo) {
                 case DERTags.OCTET_STRING:
                     return new DEROctetStringParser(defIn);
             }
@@ -153,9 +140,8 @@ public class ASN1StreamParser
 
     private void set00Check(boolean enabled)
     {
-        if (_in instanceof IndefiniteLengthInputStream)
-        {
-            ((IndefiniteLengthInputStream)_in).setEofOn00(enabled);
+        if (_in instanceof IndefiniteLengthInputStream) {
+            ((IndefiniteLengthInputStream) _in).setEofOn00(enabled);
         }
     }
 
@@ -164,8 +150,7 @@ public class ASN1StreamParser
         ASN1EncodableVector v = new ASN1EncodableVector();
 
         DEREncodable obj;
-        while ((obj = readObject()) != null)
-        {
+        while ((obj = readObject()) != null) {
             v.add(obj.getDERObject());
         }
 

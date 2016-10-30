@@ -34,7 +34,7 @@
     <string name="add_string">Text hinzufügen</string>
     <string name="algorithm">Algorithmus</string>
     <string name="algorithm_colon">Algorithmus:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Anwendungssperre</string>
     <string name="app_timeout_summary">Bei inaktiver Anwendung wird die Datenbank nach Ablauf der eingestellten Zeit automatisch gesperrt.</string>
     <string name="application">Anwendung</string>

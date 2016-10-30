@@ -18,17 +18,17 @@ package org.apache.commons.collections;
 
 import java.util.Iterator;
 
-/** 
+/**
  * Defines an iterator that can be reset back to an initial state.
  * <p>
  * This interface allows an iterator to be repeatedly reused.
  *
- * @since Commons Collections 3.0
- * @version $Revision: 646777 $ $Date: 2008-04-10 13:33:15 +0100 (Thu, 10 Apr 2008) $
- * 
  * @author Stephen Colebourne
+ * @version $Revision: 646777 $ $Date: 2008-04-10 13:33:15 +0100 (Thu, 10 Apr 2008) $
+ * @since Commons Collections 3.0
  */
-public interface ResettableIterator extends Iterator {
+public interface ResettableIterator extends Iterator
+{
 
     /**
      * Resets the iterator back to the position at which the iterator

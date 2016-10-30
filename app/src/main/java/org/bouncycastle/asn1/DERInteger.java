@@ -6,31 +6,28 @@ import java.math.BigInteger;
 import org.bouncycastle.util.Arrays;
 
 public class DERInteger
-    extends ASN1Object
+        extends ASN1Object
 {
-    byte[]      bytes;
+    byte[] bytes;
 
     /**
      * return an integer from the passed in object
      *
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static DERInteger getInstance(
-        Object  obj)
+            Object obj)
     {
-        if (obj == null || obj instanceof DERInteger)
-        {
-            return (DERInteger)obj;
+        if (obj == null || obj instanceof DERInteger) {
+            return (DERInteger) obj;
         }
 
-        if (obj instanceof ASN1OctetString)
-        {
-            return new DERInteger(((ASN1OctetString)obj).getOctets());
+        if (obj instanceof ASN1OctetString) {
+            return new DERInteger(((ASN1OctetString) obj).getOctets());
         }
 
-        if (obj instanceof ASN1TaggedObject)
-        {
-            return getInstance(((ASN1TaggedObject)obj).getObject());
+        if (obj instanceof ASN1TaggedObject) {
+            return getInstance(((ASN1TaggedObject) obj).getObject());
         }
 
         throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
@@ -39,33 +36,33 @@ public class DERInteger
     /**
      * return an Integer from a tagged object.
      *
-     * @param obj the tagged object holding the object we want
+     * @param obj      the tagged object holding the object we want
      * @param explicit true if the object is meant to be explicitly
-     *              tagged false otherwise.
-     * @exception IllegalArgumentException if the tagged object cannot
-     *               be converted.
+     *                 tagged false otherwise.
+     * @throws IllegalArgumentException if the tagged object cannot
+     *                                  be converted.
      */
     public static DERInteger getInstance(
-        ASN1TaggedObject obj,
-        boolean          explicit)
+            ASN1TaggedObject obj,
+            boolean explicit)
     {
         return getInstance(obj.getObject());
     }
 
     public DERInteger(
-        int         value)
+            int value)
     {
         bytes = BigInteger.valueOf(value).toByteArray();
     }
 
     public DERInteger(
-        BigInteger   value)
+            BigInteger value)
     {
         bytes = value.toByteArray();
     }
 
     public DERInteger(
-        byte[]   bytes)
+            byte[] bytes)
     {
         this.bytes = bytes;
     }
@@ -85,39 +82,37 @@ public class DERInteger
     }
 
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
         out.writeEncoded(INTEGER, bytes);
     }
-    
+
     public int hashCode()
     {
-         int     value = 0;
- 
-         for (int i = 0; i != bytes.length; i++)
-         {
-             value ^= (bytes[i] & 0xff) << (i % 4);
-         }
- 
-         return value;
+        int value = 0;
+
+        for (int i = 0; i != bytes.length; i++) {
+            value ^= (bytes[i] & 0xff) << (i % 4);
+        }
+
+        return value;
     }
 
     boolean asn1Equals(
-        DERObject  o)
+            DERObject o)
     {
-        if (!(o instanceof DERInteger))
-        {
+        if (!(o instanceof DERInteger)) {
             return false;
         }
 
-        DERInteger other = (DERInteger)o;
+        DERInteger other = (DERInteger) o;
 
         return Arrays.areEqual(bytes, other.bytes);
     }
 
     public String toString()
     {
-      return getValue().toString();
+        return getValue().toString();
     }
 }

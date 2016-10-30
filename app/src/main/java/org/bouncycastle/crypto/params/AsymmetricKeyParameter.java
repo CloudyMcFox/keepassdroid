@@ -3,12 +3,12 @@ package org.bouncycastle.crypto.params;
 import org.bouncycastle.crypto.CipherParameters;
 
 public class AsymmetricKeyParameter
-    implements CipherParameters
+        implements CipherParameters
 {
     boolean privateKey;
 
     public AsymmetricKeyParameter(
-        boolean privateKey)
+            boolean privateKey)
     {
         this.privateKey = privateKey;
     }

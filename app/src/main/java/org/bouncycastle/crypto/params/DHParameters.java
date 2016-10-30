@@ -5,24 +5,23 @@ import org.bouncycastle.crypto.CipherParameters;
 import java.math.BigInteger;
 
 public class DHParameters
-    implements CipherParameters
+        implements CipherParameters
 {
     private static final int DEFAULT_MINIMUM_LENGTH = 160;
 
     // not final due to compiler bug in "simpler" JDKs
-    private BigInteger              g;
-    private BigInteger              p;
-    private BigInteger              q;
-    private BigInteger              j;
-    private int                     m;
-    private int                     l;
-    private DHValidationParameters  validation;
+    private BigInteger g;
+    private BigInteger p;
+    private BigInteger q;
+    private BigInteger j;
+    private int m;
+    private int l;
+    private DHValidationParameters validation;
 
     private static int getDefaultMParam(
-        int lParam)
+            int lParam)
     {
-        if (lParam == 0)
-        {
+        if (lParam == 0) {
             return DEFAULT_MINIMUM_LENGTH;
         }
 
@@ -30,66 +29,63 @@ public class DHParameters
     }
 
     public DHParameters(
-        BigInteger  p,
-        BigInteger  g)
+            BigInteger p,
+            BigInteger g)
     {
         this(p, g, null, 0);
     }
 
     public DHParameters(
-        BigInteger  p,
-        BigInteger  g,
-        BigInteger  q)
+            BigInteger p,
+            BigInteger g,
+            BigInteger q)
     {
         this(p, g, q, 0);
     }
 
     public DHParameters(
-        BigInteger  p,
-        BigInteger  g,
-        BigInteger  q,
-        int         l)
+            BigInteger p,
+            BigInteger g,
+            BigInteger q,
+            int l)
     {
         this(p, g, q, getDefaultMParam(l), l, null, null);
     }
 
     public DHParameters(
-        BigInteger  p,
-        BigInteger  g,
-        BigInteger  q,
-        int         m,
-        int         l)
+            BigInteger p,
+            BigInteger g,
+            BigInteger q,
+            int m,
+            int l)
     {
         this(p, g, q, m, l, null, null);
     }
 
     public DHParameters(
-        BigInteger              p,
-        BigInteger              g,
-        BigInteger              q,
-        BigInteger              j,
-        DHValidationParameters  validation)
+            BigInteger p,
+            BigInteger g,
+            BigInteger q,
+            BigInteger j,
+            DHValidationParameters validation)
     {
         this(p, g, q, DEFAULT_MINIMUM_LENGTH, 0, j, validation);
     }
 
     public DHParameters(
-        BigInteger              p,
-        BigInteger              g,
-        BigInteger              q,
-        int                     m,
-        int                     l,
-        BigInteger              j,
-        DHValidationParameters  validation)
+            BigInteger p,
+            BigInteger g,
+            BigInteger q,
+            int m,
+            int l,
+            BigInteger j,
+            DHValidationParameters validation)
     {
-        if (l != 0)
-        {
-            if (l >= p.bitLength())
-            {
+        if (l != 0) {
+            if (l >= p.bitLength()) {
                 throw new IllegalArgumentException("when l value specified, it must be less than bitlength(p)");
             }
-            if (l < m)
-            {
+            if (l < m) {
                 throw new IllegalArgumentException("when l value specified, it may not be less than m value");
             }
         }
@@ -154,33 +150,27 @@ public class DHParameters
     }
 
     public boolean equals(
-        Object  obj)
+            Object obj)
     {
-        if (!(obj instanceof DHParameters))
-        {
+        if (!(obj instanceof DHParameters)) {
             return false;
         }
 
-        DHParameters    pm = (DHParameters)obj;
+        DHParameters pm = (DHParameters) obj;
 
-        if (this.getQ() != null)
-        {
-            if (!this.getQ().equals(pm.getQ()))
-            {
+        if (this.getQ() != null) {
+            if (!this.getQ().equals(pm.getQ())) {
                 return false;
             }
-        }
-        else
-        {
-            if (pm.getQ() != null)
-            {
+        } else {
+            if (pm.getQ() != null) {
                 return false;
             }
         }
 
         return pm.getP().equals(p) && pm.getG().equals(g);
     }
-    
+
     public int hashCode()
     {
         return getP().hashCode() ^ getG().hashCode() ^ (getQ() != null ? getQ().hashCode() : 0);

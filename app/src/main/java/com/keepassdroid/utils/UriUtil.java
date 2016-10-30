@@ -33,8 +33,10 @@ import java.io.InputStream;
 /**
  * Created by bpellin on 3/5/16.
  */
-public class UriUtil {
-    public static Uri parseDefaultFile(String text) {
+public class UriUtil
+{
+    public static Uri parseDefaultFile(String text)
+    {
         if (EmptyUtils.isNullOrEmpty(text)) {
             return null;
         }
@@ -46,7 +48,9 @@ public class UriUtil {
 
         return uri;
     }
-    public static Uri parseDefaultFile(Uri uri) {
+
+    public static Uri parseDefaultFile(Uri uri)
+    {
         if (EmptyUtils.isNullOrEmpty(uri.getScheme())) {
             uri = uri.buildUpon().scheme("file").authority("").build();
         }
@@ -54,24 +58,24 @@ public class UriUtil {
         return uri;
     }
 
-    public static boolean equalsDefaultfile(Uri left, String right) {
+    public static boolean equalsDefaultfile(Uri left, String right)
+    {
         left = parseDefaultFile(left);
         Uri uriRight = parseDefaultFile(right);
 
         return left.equals(uriRight);
     }
 
-    public static InputStream getUriInputStream(Context ctx, Uri uri) throws FileNotFoundException {
+    public static InputStream getUriInputStream(Context ctx, Uri uri) throws FileNotFoundException
+    {
         if (uri == null) return null;
 
         String scheme = uri.getScheme();
         if (EmptyUtils.isNullOrEmpty(scheme) || scheme.equals("file")) {
             return new FileInputStream(uri.getPath());
-        }
-        else if (scheme.equals("content")) {
+        } else if (scheme.equals("content")) {
             return ctx.getContentResolver().openInputStream(uri);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -79,15 +83,21 @@ public class UriUtil {
     /**
      * Many android apps respond with non-writeable content URIs that correspond to files.
      * This will attempt to translate the content URIs to file URIs when possible/appropriate
+     *
      * @param uri
      * @return
      */
-    public static Uri translate(Context ctx, Uri uri) {
+    public static Uri translate(Context ctx, Uri uri)
+    {
         // StorageAF provides nice URIs
-        if (StorageAF.useStorageFramework(ctx) || hasWritableContentUri(uri)) { return uri; }
+        if (StorageAF.useStorageFramework(ctx) || hasWritableContentUri(uri)) {
+            return uri;
+        }
 
         String scheme = uri.getScheme();
-        if (EmptyUtils.isNullOrEmpty(scheme)) { return uri; }
+        if (EmptyUtils.isNullOrEmpty(scheme)) {
+            return uri;
+        }
 
         String filepath = null;
 
@@ -130,8 +140,11 @@ public class UriUtil {
         return uri;
     }
 
-    private static boolean isValidFilePath(String filepath) {
-        if (EmptyUtils.isNullOrEmpty(filepath)) { return false; }
+    private static boolean isValidFilePath(String filepath)
+    {
+        if (EmptyUtils.isNullOrEmpty(filepath)) {
+            return false;
+        }
 
         File file = new File(filepath);
         return file.exists() && file.canRead();
@@ -139,15 +152,21 @@ public class UriUtil {
 
     /**
      * Whitelist for known content providers that support writing
+     *
      * @param uri
      * @return
      */
-    private static boolean hasWritableContentUri(Uri uri) {
+    private static boolean hasWritableContentUri(Uri uri)
+    {
         String scheme = uri.getScheme();
 
-        if (EmptyUtils.isNullOrEmpty(scheme)) { return false; }
+        if (EmptyUtils.isNullOrEmpty(scheme)) {
+            return false;
+        }
 
-        if (!scheme.equalsIgnoreCase("content")) { return false; }
+        if (!scheme.equalsIgnoreCase("content")) {
+            return false;
+        }
 
         switch (uri.getAuthority()) {
             case "com.google.android.apps.docs.storage":

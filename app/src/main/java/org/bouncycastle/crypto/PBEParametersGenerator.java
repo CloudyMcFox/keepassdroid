@@ -7,9 +7,9 @@ import org.bouncycastle.util.Strings;
  */
 public abstract class PBEParametersGenerator
 {
-    protected byte[]  password;
-    protected byte[]  salt;
-    protected int     iterationCount;
+    protected byte[] password;
+    protected byte[] salt;
+    protected int iterationCount;
 
     /**
      * base constructor.
@@ -21,15 +21,15 @@ public abstract class PBEParametersGenerator
     /**
      * initialise the PBE generator.
      *
-     * @param password the password converted into bytes (see below).
-     * @param salt the salt to be mixed with the password.
+     * @param password       the password converted into bytes (see below).
+     * @param salt           the salt to be mixed with the password.
      * @param iterationCount the number of iterations the "mixing" function
-     * is to be applied for.
+     *                       is to be applied for.
      */
     public void init(
-        byte[]  password,
-        byte[]  salt,
-        int     iterationCount)
+            byte[] password,
+            byte[] salt,
+            int iterationCount)
     {
         this.password = password;
         this.salt = salt;
@@ -79,7 +79,7 @@ public abstract class PBEParametersGenerator
      * an initialisation vector (IV) of length ivSize.
      *
      * @param keySize the length, in bits, of the key required.
-     * @param ivSize the length, in bits, of the iv required.
+     * @param ivSize  the length, in bits, of the iv required.
      * @return a parameters object representing a key and an IV.
      */
     public abstract CipherParameters generateDerivedParameters(int keySize, int ivSize);
@@ -101,13 +101,12 @@ public abstract class PBEParametersGenerator
      * @return a byte array representing the password.
      */
     public static byte[] PKCS5PasswordToBytes(
-        char[]  password)
+            char[] password)
     {
-        byte[]  bytes = new byte[password.length];
+        byte[] bytes = new byte[password.length];
 
-        for (int i = 0; i != bytes.length; i++)
-        {
-            bytes[i] = (byte)password[i];
+        for (int i = 0; i != bytes.length; i++) {
+            bytes[i] = (byte) password[i];
         }
 
         return bytes;
@@ -121,7 +120,7 @@ public abstract class PBEParametersGenerator
      * @return a byte array representing the password.
      */
     public static byte[] PKCS5PasswordToUTF8Bytes(
-        char[]  password)
+            char[] password)
     {
         return Strings.toUTF8ByteArray(password);
     }
@@ -134,23 +133,19 @@ public abstract class PBEParametersGenerator
      * @return a byte array representing the password.
      */
     public static byte[] PKCS12PasswordToBytes(
-        char[]  password)
+            char[] password)
     {
-        if (password.length > 0)
-        {
-                                       // +1 for extra 2 pad bytes.
-            byte[]  bytes = new byte[(password.length + 1) * 2];
+        if (password.length > 0) {
+            // +1 for extra 2 pad bytes.
+            byte[] bytes = new byte[(password.length + 1) * 2];
 
-            for (int i = 0; i != password.length; i ++)
-            {
-                bytes[i * 2] = (byte)(password[i] >>> 8);
-                bytes[i * 2 + 1] = (byte)password[i];
+            for (int i = 0; i != password.length; i++) {
+                bytes[i * 2] = (byte) (password[i] >>> 8);
+                bytes[i * 2 + 1] = (byte) password[i];
             }
 
             return bytes;
-        }
-        else
-        {
+        } else {
             return new byte[0];
         }
     }

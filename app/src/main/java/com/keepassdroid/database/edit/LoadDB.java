@@ -40,7 +40,8 @@ import com.keepassdroid.database.exception.InvalidKeyFileException;
 import com.keepassdroid.database.exception.InvalidPasswordException;
 import com.keepassdroid.database.exception.KeyFileEmptyException;
 
-public class LoadDB extends RunnableOnFinish {
+public class LoadDB extends RunnableOnFinish
+{
     private Uri mUri;
     private String mPass;
     private Uri mKey;
@@ -48,7 +49,8 @@ public class LoadDB extends RunnableOnFinish {
     private Context mCtx;
     private boolean mRememberKeyfile;
 
-    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish) {
+    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish)
+    {
         super(finish);
 
         mDb = db;
@@ -62,7 +64,8 @@ public class LoadDB extends RunnableOnFinish {
     }
 
     @Override
-    public void run() {
+    public void run()
+    {
         try {
             mDb.LoadData(mCtx, mUri, mPass, mKey, mStatus);
 
@@ -109,14 +112,14 @@ public class LoadDB extends RunnableOnFinish {
         finish(true);
     }
 
-    private void saveFileData(Uri uri, Uri key) {
-        if ( ! mRememberKeyfile ) {
+    private void saveFileData(Uri uri, Uri key)
+    {
+        if (!mRememberKeyfile) {
             key = null;
         }
 
         App.getFileHistory().createFile(uri, key);
     }
-
 
 
 }

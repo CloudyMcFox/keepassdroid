@@ -3,27 +3,27 @@ package org.bouncycastle.crypto.params;
 import java.math.BigInteger;
 
 public class RSAPrivateCrtKeyParameters
-    extends RSAKeyParameters
+        extends RSAKeyParameters
 {
-    private BigInteger  e;
-    private BigInteger  p;
-    private BigInteger  q;
-    private BigInteger  dP;
-    private BigInteger  dQ;
-    private BigInteger  qInv;
+    private BigInteger e;
+    private BigInteger p;
+    private BigInteger q;
+    private BigInteger dP;
+    private BigInteger dQ;
+    private BigInteger qInv;
 
     /**
-     * 
+     *
      */
     public RSAPrivateCrtKeyParameters(
-        BigInteger  modulus,
-        BigInteger  publicExponent,
-        BigInteger  privateExponent,
-        BigInteger  p,
-        BigInteger  q,
-        BigInteger  dP,
-        BigInteger  dQ,
-        BigInteger  qInv)
+            BigInteger modulus,
+            BigInteger publicExponent,
+            BigInteger privateExponent,
+            BigInteger p,
+            BigInteger q,
+            BigInteger dP,
+            BigInteger dQ,
+            BigInteger qInv)
     {
         super(true, modulus, privateExponent);
 

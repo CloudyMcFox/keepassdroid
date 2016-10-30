@@ -5,34 +5,34 @@ import java.math.BigInteger;
 import org.bouncycastle.crypto.CipherParameters;
 
 public class DSAParameters
-    implements CipherParameters
+        implements CipherParameters
 {
-    private BigInteger              g;
-    private BigInteger              q;
-    private BigInteger              p;
+    private BigInteger g;
+    private BigInteger q;
+    private BigInteger p;
     private DSAValidationParameters validation;
 
     public DSAParameters(
-        BigInteger  p,
-        BigInteger  q,
-        BigInteger  g)
+            BigInteger p,
+            BigInteger q,
+            BigInteger g)
     {
         this.g = g;
         this.p = p;
         this.q = q;
-    }   
+    }
 
     public DSAParameters(
-        BigInteger              p,
-        BigInteger              q,
-        BigInteger              g,
-        DSAValidationParameters params)
+            BigInteger p,
+            BigInteger q,
+            BigInteger g,
+            DSAValidationParameters params)
     {
         this.g = g;
         this.p = p;
         this.q = q;
         this.validation = params;
-    }   
+    }
 
     public BigInteger getP()
     {
@@ -55,18 +55,17 @@ public class DSAParameters
     }
 
     public boolean equals(
-        Object  obj)
+            Object obj)
     {
-        if (!(obj instanceof DSAParameters))
-        {
+        if (!(obj instanceof DSAParameters)) {
             return false;
         }
 
-        DSAParameters    pm = (DSAParameters)obj;
+        DSAParameters pm = (DSAParameters) obj;
 
         return (pm.getP().equals(p) && pm.getQ().equals(q) && pm.getG().equals(g));
     }
-    
+
     public int hashCode()
     {
         return getP().hashCode() ^ getQ().hashCode() ^ getG().hashCode();

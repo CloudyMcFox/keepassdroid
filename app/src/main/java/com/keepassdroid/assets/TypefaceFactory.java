@@ -25,29 +25,32 @@ import org.apache.commons.collections.map.ReferenceMap;
 import android.content.Context;
 import android.graphics.Typeface;
 
-/** Class to cache and return Typeface assets to workaround a bug in some versions of 
+/**
+ * Class to cache and return Typeface assets to workaround a bug in some versions of
  * Android.
- * 
+ * <p>
  * https://code.google.com/p/android/issues/detail?id=9904
- * @author bpellin
  *
+ * @author bpellin
  */
-public class TypefaceFactory {
-	private static ReferenceMap typefaceMap = new ReferenceMap(AbstractReferenceMap.HARD, AbstractReferenceMap.WEAK);
+public class TypefaceFactory
+{
+    private static ReferenceMap typefaceMap = new ReferenceMap(AbstractReferenceMap.HARD, AbstractReferenceMap.WEAK);
 
-	public static Typeface getTypeface(Context ctx, String fontPath) {
-		Typeface tf;
-		
-		tf = (Typeface) typefaceMap.get(fontPath);
-		if (tf != null) {
-			return tf;
-		}
-		
-		try {
-		    return Typeface.createFromAsset(ctx.getAssets(), fontPath);
-		} catch (Exception e) {
-			// Return null if we can't create it
-			return null;
-		}
-	}
+    public static Typeface getTypeface(Context ctx, String fontPath)
+    {
+        Typeface tf;
+
+        tf = (Typeface) typefaceMap.get(fontPath);
+        if (tf != null) {
+            return tf;
+        }
+
+        try {
+            return Typeface.createFromAsset(ctx.getAssets(), fontPath);
+        } catch (Exception e) {
+            // Return null if we can't create it
+            return null;
+        }
+    }
 }

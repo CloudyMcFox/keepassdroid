@@ -16,9 +16,9 @@ import java.io.ObjectInputStream;
 
 @SuppressWarnings("unchecked")
 class PKCS12BagAttributeCarrierImpl
-    implements PKCS12BagAttributeCarrier
+        implements PKCS12BagAttributeCarrier
 {
-	private Hashtable pkcs12Attributes;
+    private Hashtable pkcs12Attributes;
     private Vector pkcs12Ordering;
 
     PKCS12BagAttributeCarrierImpl(Hashtable attributes, Vector ordering)
@@ -33,24 +33,21 @@ class PKCS12BagAttributeCarrierImpl
     }
 
     public void setBagAttribute(
-        DERObjectIdentifier oid,
-        DEREncodable        attribute)
+            DERObjectIdentifier oid,
+            DEREncodable attribute)
     {
-        if (pkcs12Attributes.containsKey(oid))
-        {                           // preserve original ordering
+        if (pkcs12Attributes.containsKey(oid)) {                           // preserve original ordering
             pkcs12Attributes.put(oid, attribute);
-        }
-        else
-        {
+        } else {
             pkcs12Attributes.put(oid, attribute);
             pkcs12Ordering.addElement(oid);
         }
     }
 
     public DEREncodable getBagAttribute(
-        DERObjectIdentifier oid)
+            DERObjectIdentifier oid)
     {
-        return (DEREncodable)pkcs12Attributes.get(oid);
+        return (DEREncodable) pkcs12Attributes.get(oid);
     }
 
     public Enumeration getBagAttributeKeys()
@@ -74,23 +71,19 @@ class PKCS12BagAttributeCarrierImpl
     }
 
     public void writeObject(ObjectOutputStream out)
-        throws IOException
+            throws IOException
     {
-        if (pkcs12Ordering.size() == 0)
-        {
+        if (pkcs12Ordering.size() == 0) {
             out.writeObject(new Hashtable());
             out.writeObject(new Vector());
-        }
-        else
-        {
+        } else {
             ByteArrayOutputStream bOut = new ByteArrayOutputStream();
             ASN1OutputStream aOut = new ASN1OutputStream(bOut);
 
-            Enumeration             e = this.getBagAttributeKeys();
+            Enumeration e = this.getBagAttributeKeys();
 
-            while (e.hasMoreElements())
-            {
-                DERObjectIdentifier    oid = (DERObjectIdentifier)e.nextElement();
+            while (e.hasMoreElements()) {
+                DERObjectIdentifier oid = (DERObjectIdentifier) e.nextElement();
 
                 aOut.writeObject(oid);
                 aOut.writeObject(pkcs12Attributes.get(oid));
@@ -101,23 +94,19 @@ class PKCS12BagAttributeCarrierImpl
     }
 
     public void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException
+            throws IOException, ClassNotFoundException
     {
         Object obj = in.readObject();
 
-        if (obj instanceof Hashtable)
-        {
-            this.pkcs12Attributes = (Hashtable)obj;
-            this.pkcs12Ordering = (Vector)in.readObject();
-        }
-        else
-        {
-            ASN1InputStream aIn = new ASN1InputStream((byte[])obj);
+        if (obj instanceof Hashtable) {
+            this.pkcs12Attributes = (Hashtable) obj;
+            this.pkcs12Ordering = (Vector) in.readObject();
+        } else {
+            ASN1InputStream aIn = new ASN1InputStream((byte[]) obj);
 
-            DERObjectIdentifier    oid;
+            DERObjectIdentifier oid;
 
-            while ((oid = (DERObjectIdentifier)aIn.readObject()) != null)
-            {
+            while ((oid = (DERObjectIdentifier) aIn.readObject()) != null) {
                 this.setBagAttribute(oid, aIn.readObject());
             }
         }

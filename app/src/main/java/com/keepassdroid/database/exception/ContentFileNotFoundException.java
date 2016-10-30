@@ -28,9 +28,13 @@ import java.io.FileNotFoundException;
 /**
  * Created by bpellin on 3/14/16.
  */
-public class ContentFileNotFoundException extends FileNotFoundException {
-    public static FileNotFoundException getInstance(Uri uri) {
-        if (uri == null) { return new FileNotFoundException(); }
+public class ContentFileNotFoundException extends FileNotFoundException
+{
+    public static FileNotFoundException getInstance(Uri uri)
+    {
+        if (uri == null) {
+            return new FileNotFoundException();
+        }
 
         String scheme = uri.getScheme();
 
@@ -41,7 +45,8 @@ public class ContentFileNotFoundException extends FileNotFoundException {
         return new FileNotFoundException();
     }
 
-    public  ContentFileNotFoundException() {
+    public ContentFileNotFoundException()
+    {
         super();
     }
 }

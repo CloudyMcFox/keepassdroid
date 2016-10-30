@@ -29,20 +29,24 @@ import android.widget.TextView;
 import com.android.keepass.R;
 import com.keepassdroid.database.security.ProtectedString;
 
-public class EntryEditSection extends RelativeLayout {
-	
-	public EntryEditSection(Context context) {
-		super(context);
-	}
-	
-	public EntryEditSection(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
-	
-	public EntryEditSection(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-	}
-	
+public class EntryEditSection extends RelativeLayout
+{
+
+    public EntryEditSection(Context context)
+    {
+        super(context);
+    }
+
+    public EntryEditSection(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+    }
+
+    public EntryEditSection(Context context, AttributeSet attrs, int defStyle)
+    {
+        super(context, attrs, defStyle);
+    }
+
 	/*
 	public EntryEditSection(Context context, AttributeSet attrs, String title, ProtectedString value) {
 		super(context, attrs);
@@ -64,20 +68,22 @@ public class EntryEditSection extends RelativeLayout {
 		
 		inflater.inflate(getLayout(), this);
 	*/
-	
-	public void setData(String title, ProtectedString value) {
-		setText(R.id.title, title);
-		setText(R.id.value, value.toString());
-		
-		CheckBox cb = (CheckBox) findViewById(R.id.protection);
-		cb.setChecked(value.isProtected());
-	}
 
-	private void setText(int resId, String str) {
-		if (str != null) {
-			TextView tvTitle = (TextView) findViewById(resId);
-			tvTitle.setText(str);
-		}
-		
-	}
+    public void setData(String title, ProtectedString value)
+    {
+        setText(R.id.title, title);
+        setText(R.id.value, value.toString());
+
+        CheckBox cb = (CheckBox) findViewById(R.id.protection);
+        cb.setChecked(value.isProtected());
+    }
+
+    private void setText(int resId, String str)
+    {
+        if (str != null) {
+            TextView tvTitle = (TextView) findViewById(resId);
+            tvTitle.setText(str);
+        }
+
+    }
 }

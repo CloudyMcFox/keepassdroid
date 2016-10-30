@@ -19,8 +19,9 @@
  */
 package com.keepassdroid.database;
 
-public enum PwEncryptionAlgorithm {
-	
-	Rjindal,
-	Twofish;
+public enum PwEncryptionAlgorithm
+{
+
+    Rjindal,
+    Twofish;
 }

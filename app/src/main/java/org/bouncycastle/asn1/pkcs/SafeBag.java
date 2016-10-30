@@ -10,15 +10,15 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 
 public class SafeBag
-    extends ASN1Encodable
+        extends ASN1Encodable
 {
-    DERObjectIdentifier         bagId;
-    DERObject                   bagValue;
-    ASN1Set                     bagAttributes;
+    DERObjectIdentifier bagId;
+    DERObject bagValue;
+    ASN1Set bagAttributes;
 
     public SafeBag(
-        DERObjectIdentifier     oid,
-        DERObject               obj)
+            DERObjectIdentifier oid,
+            DERObject obj)
     {
         this.bagId = oid;
         this.bagValue = obj;
@@ -26,9 +26,9 @@ public class SafeBag
     }
 
     public SafeBag(
-        DERObjectIdentifier     oid,
-        DERObject               obj,
-        ASN1Set                 bagAttributes)
+            DERObjectIdentifier oid,
+            DERObject obj,
+            ASN1Set bagAttributes)
     {
         this.bagId = oid;
         this.bagValue = obj;
@@ -36,13 +36,12 @@ public class SafeBag
     }
 
     public SafeBag(
-        ASN1Sequence    seq)
+            ASN1Sequence seq)
     {
-        this.bagId = (DERObjectIdentifier)seq.getObjectAt(0);
-        this.bagValue = ((DERTaggedObject)seq.getObjectAt(1)).getObject();
-        if (seq.size() == 3)
-        {
-            this.bagAttributes = (ASN1Set)seq.getObjectAt(2);
+        this.bagId = (DERObjectIdentifier) seq.getObjectAt(0);
+        this.bagValue = ((DERTaggedObject) seq.getObjectAt(1)).getObject();
+        if (seq.size() == 3) {
+            this.bagAttributes = (ASN1Set) seq.getObjectAt(2);
         }
     }
 
@@ -68,8 +67,7 @@ public class SafeBag
         v.add(bagId);
         v.add(new DERTaggedObject(0, bagValue));
 
-        if (bagAttributes != null)
-        {
+        if (bagAttributes != null) {
             v.add(bagAttributes);
         }
 

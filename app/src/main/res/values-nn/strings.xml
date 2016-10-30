@@ -28,7 +28,7 @@
     <string name="add_group_title">Legg til gruppe</string>
     <string name="algorithm">Algoritme</string>
     <string name="algorithm_colon">Algoritme:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Programtidsavbrot</string>
     <string name="app_timeout_summary">Tid før databasen blir låst når programmet ikkje er i bruk.</string>
     <string name="application">Program</string>

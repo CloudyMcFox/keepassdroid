@@ -15,7 +15,7 @@ public interface BlockCipherPadding
      * @param random the source of randomness for the padding, if required.
      */
     public void init(SecureRandom random)
-        throws IllegalArgumentException;
+            throws IllegalArgumentException;
 
     /**
      * Return the name of the algorithm the cipher implements.
@@ -28,7 +28,7 @@ public interface BlockCipherPadding
      * add the pad bytes to the passed in block, returning the
      * number of bytes added.
      * <p>
-     * Note: this assumes that the last block of plain text is always 
+     * Note: this assumes that the last block of plain text is always
      * passed to it inside in. i.e. if inOff is zero, indicating the
      * entire block is to be overwritten with padding the value of in
      * should be the same as the last block of plain text. The reason
@@ -40,9 +40,10 @@ public interface BlockCipherPadding
 
     /**
      * return the number of pad bytes present in the block.
-     * @exception InvalidCipherTextException if the padding is badly formed
-     * or invalid.
+     *
+     * @throws InvalidCipherTextException if the padding is badly formed
+     *                                    or invalid.
      */
     public int padCount(byte[] in)
-        throws InvalidCipherTextException;
+            throws InvalidCipherTextException;
 }

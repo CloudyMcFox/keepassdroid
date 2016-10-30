@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.DERObject;
  * @deprecated use ASN1Dump.
  */
 public class DERDump
-    extends ASN1Dump
+        extends ASN1Dump
 {
     /**
      * dump out a DER object as a formatted string
@@ -15,7 +15,7 @@ public class DERDump
      * @param obj the DERObject to be dumped out.
      */
     public static String dumpAsString(
-        DERObject   obj)
+            DERObject obj)
     {
         StringBuffer buf = new StringBuffer();
 
@@ -30,7 +30,7 @@ public class DERDump
      * @param obj the DERObject to be dumped out.
      */
     public static String dumpAsString(
-        DEREncodable   obj)
+            DEREncodable obj)
     {
         StringBuffer buf = new StringBuffer();
 

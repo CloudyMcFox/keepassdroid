@@ -19,27 +19,30 @@
  */
 package com.keepassdroid.database;
 
-public enum CrsAlgorithm {
-	
-	Null(0),
-	ArcFourVariant(1),
-	Salsa20(2);
-	
-	public static final int count = 3;
-	public final int id;
-	
-	private CrsAlgorithm(int num) {
-		id = num;
-	}
+public enum CrsAlgorithm
+{
 
-	public static CrsAlgorithm fromId(int num) {
-		for ( CrsAlgorithm e : CrsAlgorithm.values() ) {
-			if ( e.id == num ) {
-				return e;
-			}
-		}
-		
-		return null;
-	}
+    Null(0),
+    ArcFourVariant(1),
+    Salsa20(2);
+
+    public static final int count = 3;
+    public final int id;
+
+    private CrsAlgorithm(int num)
+    {
+        id = num;
+    }
+
+    public static CrsAlgorithm fromId(int num)
+    {
+        for (CrsAlgorithm e : CrsAlgorithm.values()) {
+            if (e.id == num) {
+                return e;
+            }
+        }
+
+        return null;
+    }
 
 }

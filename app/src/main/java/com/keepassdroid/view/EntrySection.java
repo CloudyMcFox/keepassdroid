@@ -27,39 +27,46 @@ import android.widget.TextView;
 
 import com.android.keepass.R;
 
-public class EntrySection extends LinearLayout {
+public class EntrySection extends LinearLayout
+{
 
-	public EntrySection(Context context) {
-		this(context, null);
-	}
-	
-	public EntrySection(Context context, AttributeSet attrs) {
-		this(context, attrs, null, null);
-	}
-	
-	public EntrySection(Context context, AttributeSet attrs, String title, String value) {
-		super(context, attrs);
-		
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		inflate(inflater, context, title, value);
-	}
+    public EntrySection(Context context)
+    {
+        this(context, null);
+    }
 
-	protected int getLayout() {
-		return R.layout.entry_section;
-	}
+    public EntrySection(Context context, AttributeSet attrs)
+    {
+        this(context, attrs, null, null);
+    }
 
-	protected void inflate(LayoutInflater inflater, Context context, String title, String value) {
-		inflater.inflate(getLayout(), this);
-		
-		setText(R.id.title, title);
-		setText(R.id.value, value);
-	}
-	
-	private void setText(int resId, String str) {
-		if (str != null) {
-			TextView tvTitle = (TextView) findViewById(resId);
-			tvTitle.setText(str);
-		}
-		
-	}
+    public EntrySection(Context context, AttributeSet attrs, String title, String value)
+    {
+        super(context, attrs);
+
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflate(inflater, context, title, value);
+    }
+
+    protected int getLayout()
+    {
+        return R.layout.entry_section;
+    }
+
+    protected void inflate(LayoutInflater inflater, Context context, String title, String value)
+    {
+        inflater.inflate(getLayout(), this);
+
+        setText(R.id.title, title);
+        setText(R.id.value, value);
+    }
+
+    private void setText(int resId, String str)
+    {
+        if (str != null) {
+            TextView tvTitle = (TextView) findViewById(resId);
+            tvTitle.setText(str);
+        }
+
+    }
 }

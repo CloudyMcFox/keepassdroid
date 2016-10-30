@@ -9,7 +9,7 @@ import java.util.Enumeration;
  */
 @SuppressWarnings("unchecked")
 public class DERSet
-    extends ASN1Set
+        extends ASN1Set
 {
     /**
      * create an empty set
@@ -22,7 +22,7 @@ public class DERSet
      * @param obj - a single object that makes up the set.
      */
     public DERSet(
-        DEREncodable   obj)
+            DEREncodable obj)
     {
         this.addObject(obj);
     }
@@ -31,39 +31,36 @@ public class DERSet
      * @param v - a vector of objects making up the set.
      */
     public DERSet(
-        DEREncodableVector   v)
+            DEREncodableVector v)
     {
         this(v, true);
     }
-    
+
     /**
      * create a set from an array of objects.
      */
     public DERSet(
-        ASN1Encodable[]   a)
+            ASN1Encodable[] a)
     {
-        for (int i = 0; i != a.length; i++)
-        {
+        for (int i = 0; i != a.length; i++) {
             this.addObject(a[i]);
         }
-        
+
         this.sort();
     }
-    
+
     /**
      * @param v - a vector of objects making up the set.
      */
     DERSet(
-        DEREncodableVector   v,
-        boolean              needsSorting)
+            DEREncodableVector v,
+            boolean needsSorting)
     {
-        for (int i = 0; i != v.size(); i++)
-        {
+        for (int i = 0; i != v.size(); i++) {
             this.addObject(v.get(i));
         }
 
-        if (needsSorting)
-        {
+        if (needsSorting) {
             this.sort();
         }
     }
@@ -77,24 +74,23 @@ public class DERSet
      * we also have to specify CONSTRUCTED, and the objects length.
      */
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
         // TODO Intermediate buffer could be avoided if we could calculate expected length
-        ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
-        DEROutputStream         dOut = new DEROutputStream(bOut);
-        Enumeration             e = this.getObjects();
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        DEROutputStream dOut = new DEROutputStream(bOut);
+        Enumeration e = this.getObjects();
 
-        while (e.hasMoreElements())
-        {
-            Object    obj = e.nextElement();
+        while (e.hasMoreElements()) {
+            Object obj = e.nextElement();
 
             dOut.writeObject(obj);
         }
 
         dOut.close();
 
-        byte[]  bytes = bOut.toByteArray();
+        byte[] bytes = bOut.toByteArray();
 
         out.writeEncoded(SET | CONSTRUCTED, bytes);
     }

@@ -9,26 +9,26 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * implements a Cipher-FeedBack (CFB) mode on top of a simple cipher.
  */
 public class CFBBlockCipher
-    implements BlockCipher
+        implements BlockCipher
 {
-    private byte[]          IV;
-    private byte[]          cfbV;
-    private byte[]          cfbOutV;
+    private byte[] IV;
+    private byte[] cfbV;
+    private byte[] cfbOutV;
 
-    private int             blockSize;
-    private BlockCipher     cipher = null;
-    private boolean         encrypting;
+    private int blockSize;
+    private BlockCipher cipher = null;
+    private boolean encrypting;
 
     /**
      * Basic constructor.
      *
-     * @param cipher the block cipher to be used as the basis of the
-     * feedback mode.
+     * @param cipher       the block cipher to be used as the basis of the
+     *                     feedback mode.
      * @param bitBlockSize the block size in bits (note: a multiple of 8)
      */
     public CFBBlockCipher(
-        BlockCipher cipher,
-        int         bitBlockSize)
+            BlockCipher cipher,
+            int bitBlockSize)
     {
         this.cipher = cipher;
         this.blockSize = bitBlockSize / 8;
@@ -54,46 +54,39 @@ public class CFBBlockCipher
      * An IV which is too short is handled in FIPS compliant fashion.
      *
      * @param encrypting if true the cipher is initialised for
-     *  encryption, if false for decryption.
-     * @param params the key and other data required by the cipher.
-     * @exception IllegalArgumentException if the params argument is
-     * inappropriate.
+     *                   encryption, if false for decryption.
+     * @param params     the key and other data required by the cipher.
+     * @throws IllegalArgumentException if the params argument is
+     *                                  inappropriate.
      */
     public void init(
-        boolean             encrypting,
-        CipherParameters    params)
-        throws IllegalArgumentException
+            boolean encrypting,
+            CipherParameters params)
+            throws IllegalArgumentException
     {
         this.encrypting = encrypting;
-        
-        if (params instanceof ParametersWithIV)
-        {
-                ParametersWithIV ivParam = (ParametersWithIV)params;
-                byte[]      iv = ivParam.getIV();
 
-                if (iv.length < IV.length)
-                {
-                    // prepend the supplied IV with zeros (per FIPS PUB 81)
-                    System.arraycopy(iv, 0, IV, IV.length - iv.length, iv.length);
-                    for (int i = 0; i < IV.length - iv.length; i++)
-                    {
-                        IV[i] = 0;
-                    }
+        if (params instanceof ParametersWithIV) {
+            ParametersWithIV ivParam = (ParametersWithIV) params;
+            byte[] iv = ivParam.getIV();
+
+            if (iv.length < IV.length) {
+                // prepend the supplied IV with zeros (per FIPS PUB 81)
+                System.arraycopy(iv, 0, IV, IV.length - iv.length, iv.length);
+                for (int i = 0; i < IV.length - iv.length; i++) {
+                    IV[i] = 0;
                 }
-                else
-                {
-                    System.arraycopy(iv, 0, IV, 0, IV.length);
-                }
+            } else {
+                System.arraycopy(iv, 0, IV, 0, IV.length);
+            }
 
-                reset();
+            reset();
 
-                cipher.init(true, ivParam.getParameters());
-        }
-        else
-        {
-                reset();
+            cipher.init(true, ivParam.getParameters());
+        } else {
+            reset();
 
-                cipher.init(true, params);
+            cipher.init(true, params);
         }
     }
 
@@ -122,21 +115,21 @@ public class CFBBlockCipher
      * Process one block of input from the array in and write it to
      * the out array.
      *
-     * @param in the array containing the input data.
-     * @param inOff offset into the in array the data starts at.
-     * @param out the array the output data will be copied into.
+     * @param in     the array containing the input data.
+     * @param inOff  offset into the in array the data starts at.
+     * @param out    the array the output data will be copied into.
      * @param outOff the offset into the out array the output will start at.
-     * @exception DataLengthException if there isn't enough data in in, or
-     * space in out.
-     * @exception IllegalStateException if the cipher isn't initialised.
      * @return the number of bytes processed and produced.
+     * @throws DataLengthException   if there isn't enough data in in, or
+     *                               space in out.
+     * @throws IllegalStateException if the cipher isn't initialised.
      */
     public int processBlock(
-        byte[]      in,
-        int         inOff,
-        byte[]      out,
-        int         outOff)
-        throws DataLengthException, IllegalStateException
+            byte[] in,
+            int inOff,
+            byte[] out,
+            int outOff)
+            throws DataLengthException, IllegalStateException
     {
         return (encrypting) ? encryptBlock(in, inOff, out, outOff) : decryptBlock(in, inOff, out, outOff);
     }
@@ -144,29 +137,27 @@ public class CFBBlockCipher
     /**
      * Do the appropriate processing for CFB mode encryption.
      *
-     * @param in the array containing the data to be encrypted.
-     * @param inOff offset into the in array the data starts at.
-     * @param out the array the encrypted data will be copied into.
+     * @param in     the array containing the data to be encrypted.
+     * @param inOff  offset into the in array the data starts at.
+     * @param out    the array the encrypted data will be copied into.
      * @param outOff the offset into the out array the output will start at.
-     * @exception DataLengthException if there isn't enough data in in, or
-     * space in out.
-     * @exception IllegalStateException if the cipher isn't initialised.
      * @return the number of bytes processed and produced.
+     * @throws DataLengthException   if there isn't enough data in in, or
+     *                               space in out.
+     * @throws IllegalStateException if the cipher isn't initialised.
      */
     public int encryptBlock(
-        byte[]      in,
-        int         inOff,
-        byte[]      out,
-        int         outOff)
-        throws DataLengthException, IllegalStateException
+            byte[] in,
+            int inOff,
+            byte[] out,
+            int outOff)
+            throws DataLengthException, IllegalStateException
     {
-        if ((inOff + blockSize) > in.length)
-        {
+        if ((inOff + blockSize) > in.length) {
             throw new DataLengthException("input buffer too short");
         }
 
-        if ((outOff + blockSize) > out.length)
-        {
+        if ((outOff + blockSize) > out.length) {
             throw new DataLengthException("output buffer too short");
         }
 
@@ -175,9 +166,8 @@ public class CFBBlockCipher
         //
         // XOR the cfbV with the plaintext producing the ciphertext
         //
-        for (int i = 0; i < blockSize; i++)
-        {
-            out[outOff + i] = (byte)(cfbOutV[i] ^ in[inOff + i]);
+        for (int i = 0; i < blockSize; i++) {
+            out[outOff + i] = (byte) (cfbOutV[i] ^ in[inOff + i]);
         }
 
         //
@@ -192,29 +182,27 @@ public class CFBBlockCipher
     /**
      * Do the appropriate processing for CFB mode decryption.
      *
-     * @param in the array containing the data to be decrypted.
-     * @param inOff offset into the in array the data starts at.
-     * @param out the array the encrypted data will be copied into.
+     * @param in     the array containing the data to be decrypted.
+     * @param inOff  offset into the in array the data starts at.
+     * @param out    the array the encrypted data will be copied into.
      * @param outOff the offset into the out array the output will start at.
-     * @exception DataLengthException if there isn't enough data in in, or
-     * space in out.
-     * @exception IllegalStateException if the cipher isn't initialised.
      * @return the number of bytes processed and produced.
+     * @throws DataLengthException   if there isn't enough data in in, or
+     *                               space in out.
+     * @throws IllegalStateException if the cipher isn't initialised.
      */
     public int decryptBlock(
-        byte[]      in,
-        int         inOff,
-        byte[]      out,
-        int         outOff)
-        throws DataLengthException, IllegalStateException
+            byte[] in,
+            int inOff,
+            byte[] out,
+            int outOff)
+            throws DataLengthException, IllegalStateException
     {
-        if ((inOff + blockSize) > in.length)
-        {
+        if ((inOff + blockSize) > in.length) {
             throw new DataLengthException("input buffer too short");
         }
 
-        if ((outOff + blockSize) > out.length)
-        {
+        if ((outOff + blockSize) > out.length) {
             throw new DataLengthException("output buffer too short");
         }
 
@@ -229,9 +217,8 @@ public class CFBBlockCipher
         //
         // XOR the cfbV with the ciphertext producing the plaintext
         //
-        for (int i = 0; i < blockSize; i++)
-        {
-            out[outOff + i] = (byte)(cfbOutV[i] ^ in[inOff + i]);
+        for (int i = 0; i < blockSize; i++) {
+            out[outOff + i] = (byte) (cfbOutV[i] ^ in[inOff + i]);
         }
 
         return blockSize;

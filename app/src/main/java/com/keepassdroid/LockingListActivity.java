@@ -23,18 +23,21 @@ import android.app.ListActivity;
 
 import com.keepassdroid.timeout.TimeoutHelper;
 
-public abstract class LockingListActivity extends ListActivity {
-	@Override
-	protected void onPause() {
-		super.onPause();
-		
-		TimeoutHelper.pause(this);
-	}
+public abstract class LockingListActivity extends ListActivity
+{
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+        TimeoutHelper.pause(this);
+    }
 
-		TimeoutHelper.resume(this);
-	}
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        TimeoutHelper.resume(this);
+    }
 }

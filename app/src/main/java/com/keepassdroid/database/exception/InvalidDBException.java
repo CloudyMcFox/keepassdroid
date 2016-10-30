@@ -19,19 +19,22 @@
  */
 package com.keepassdroid.database.exception;
 
-public class InvalidDBException extends Exception {
+public class InvalidDBException extends Exception
+{
 
-	public InvalidDBException(String str) {
-		super(str);
-	}
+    public InvalidDBException(String str)
+    {
+        super(str);
+    }
 
-	public InvalidDBException() {
-		super();
-	}
+    public InvalidDBException()
+    {
+        super();
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 5191964825154190923L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5191964825154190923L;
 
 }

@@ -26,96 +26,102 @@ import com.keepassdroid.database.PwDatabase;
 import com.keepassdroid.database.PwEntry;
 import com.keepassdroid.database.PwGroup;
 
-/** Task to delete entries
- * @author bpellin
+/**
+ * Task to delete entries
  *
+ * @author bpellin
  */
-public class DeleteEntry extends RunnableOnFinish {
+public class DeleteEntry extends RunnableOnFinish
+{
 
-	private Database mDb;
-	private PwEntry mEntry;
-	private boolean mDontSave;
-	private Context ctx;
-	
-	public DeleteEntry(Context ctx, Database db, PwEntry entry, OnFinish finish) {
-		this(ctx, db, entry, finish, false);
-	}
-	
-	public DeleteEntry(Context ctx, Database db, PwEntry entry, OnFinish finish, boolean dontSave) {
-		super(finish);
-		
-		mDb = db;
-		mEntry = entry;
-		mDontSave = dontSave;
-		this.ctx = ctx;
-		
-	}
-	
-	@Override
-	public void run() {
-		PwDatabase pm = mDb.pm;
-		PwGroup parent = mEntry.getParent();
+    private Database mDb;
+    private PwEntry mEntry;
+    private boolean mDontSave;
+    private Context ctx;
 
-		// Remove Entry from parent
-		boolean recycle = pm.canRecycle(mEntry);
-		if (recycle) {
-			pm.recycle(mEntry);
-		}
-		else {
-			pm.deleteEntry(mEntry);
-		}
-		
-		// Save
-		mFinish = new AfterDelete(mFinish, parent, mEntry, recycle);
-		
-		// Commit database
-		SaveDB save = new SaveDB(ctx, mDb, mFinish, mDontSave);
-		save.run();
-	
-		
-	}
+    public DeleteEntry(Context ctx, Database db, PwEntry entry, OnFinish finish)
+    {
+        this(ctx, db, entry, finish, false);
+    }
 
-	private class AfterDelete extends OnFinish {
+    public DeleteEntry(Context ctx, Database db, PwEntry entry, OnFinish finish, boolean dontSave)
+    {
+        super(finish);
 
-		private PwGroup mParent;
-		private PwEntry mEntry;
-		private boolean recycled;
-		
-		public AfterDelete(OnFinish finish, PwGroup parent, PwEntry entry, boolean r) {
-			super(finish);
-			
-			mParent = parent;
-			mEntry = entry;
-			recycled = r;
-		}
-		
-		@Override
-		public void run() {
-			PwDatabase pm = mDb.pm;
-			if ( mSuccess ) {
-				// Mark parent dirty
-				if ( mParent != null ) {
-					mDb.dirty.add(mParent);
-				}
-				
-				if (recycled) {
-					PwGroup recycleBin = pm.getRecycleBin();
-					mDb.dirty.add(recycleBin);
-					mDb.dirty.add(mDb.pm.rootGroup);
-				}
-			} else {
-				if (recycled) {
-					pm.undoRecycle(mEntry, mParent);
-				}
-				else {
-					pm.undoDeleteEntry(mEntry, mParent);
-				}
-			}
+        mDb = db;
+        mEntry = entry;
+        mDontSave = dontSave;
+        this.ctx = ctx;
 
-			super.run();
-			
-		}
-		
-	}
-	
+    }
+
+    @Override
+    public void run()
+    {
+        PwDatabase pm = mDb.pm;
+        PwGroup parent = mEntry.getParent();
+
+        // Remove Entry from parent
+        boolean recycle = pm.canRecycle(mEntry);
+        if (recycle) {
+            pm.recycle(mEntry);
+        } else {
+            pm.deleteEntry(mEntry);
+        }
+
+        // Save
+        mFinish = new AfterDelete(mFinish, parent, mEntry, recycle);
+
+        // Commit database
+        SaveDB save = new SaveDB(ctx, mDb, mFinish, mDontSave);
+        save.run();
+
+
+    }
+
+    private class AfterDelete extends OnFinish
+    {
+
+        private PwGroup mParent;
+        private PwEntry mEntry;
+        private boolean recycled;
+
+        public AfterDelete(OnFinish finish, PwGroup parent, PwEntry entry, boolean r)
+        {
+            super(finish);
+
+            mParent = parent;
+            mEntry = entry;
+            recycled = r;
+        }
+
+        @Override
+        public void run()
+        {
+            PwDatabase pm = mDb.pm;
+            if (mSuccess) {
+                // Mark parent dirty
+                if (mParent != null) {
+                    mDb.dirty.add(mParent);
+                }
+
+                if (recycled) {
+                    PwGroup recycleBin = pm.getRecycleBin();
+                    mDb.dirty.add(recycleBin);
+                    mDb.dirty.add(mDb.pm.rootGroup);
+                }
+            } else {
+                if (recycled) {
+                    pm.undoRecycle(mEntry, mParent);
+                } else {
+                    pm.undoDeleteEntry(mEntry, mParent);
+                }
+            }
+
+            super.run();
+
+        }
+
+    }
+
 }

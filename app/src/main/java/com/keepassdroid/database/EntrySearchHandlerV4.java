@@ -25,24 +25,27 @@ import java.util.Locale;
 import com.keepassdroid.utils.StrUtil;
 import com.keepassdroid.utils.UuidUtil;
 
-public class EntrySearchHandlerV4 extends EntrySearchHandler {
-	private SearchParametersV4 sp;
+public class EntrySearchHandlerV4 extends EntrySearchHandler
+{
+    private SearchParametersV4 sp;
 
-	protected EntrySearchHandlerV4(SearchParameters sp, List<PwEntry> listStorage) {
-		super(sp, listStorage);
-		this.sp = (SearchParametersV4) sp;
-	}
+    protected EntrySearchHandlerV4(SearchParameters sp, List<PwEntry> listStorage)
+    {
+        super(sp, listStorage);
+        this.sp = (SearchParametersV4) sp;
+    }
 
-	@Override
-	protected boolean searchID(PwEntry e) {
-		PwEntryV4 entry = (PwEntryV4) e;
-		if (sp.searchInUUIDs) {
-			String hex = UuidUtil.toHexString(entry.uuid);
-			return StrUtil.indexOfIgnoreCase(hex, sp.searchString, Locale.ENGLISH) >= 0;
-		}
-		
-		return false;
-	}
+    @Override
+    protected boolean searchID(PwEntry e)
+    {
+        PwEntryV4 entry = (PwEntryV4) e;
+        if (sp.searchInUUIDs) {
+            String hex = UuidUtil.toHexString(entry.uuid);
+            return StrUtil.indexOfIgnoreCase(hex, sp.searchString, Locale.ENGLISH) >= 0;
+        }
 
-	
+        return false;
+    }
+
+
 }

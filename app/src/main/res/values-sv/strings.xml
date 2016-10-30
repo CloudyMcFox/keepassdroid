@@ -30,7 +30,7 @@
     <string name="add_group_title">Ny grupp</string>
     <string name="algorithm">Algoritm</string>
     <string name="algorithm_colon">Algoritm:</string>
-    <string name="app_name">KeePassDroid</string>
+    <string name="app_name">KeePass</string>
     <string name="app_timeout">Tidsgräns för applikation</string>
     <string name="app_timeout_summary">Tid innan låsning när applikationen är inaktiv.</string>
     <string name="application">Applikation</string>

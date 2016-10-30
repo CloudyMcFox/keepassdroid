@@ -8,16 +8,15 @@ abstract class LimitedInputStream
     protected final InputStream _in;
 
     LimitedInputStream(
-        InputStream in)
+            InputStream in)
     {
         this._in = in;
     }
 
     protected void setParentEofDetect(boolean on)
     {
-        if (_in instanceof IndefiniteLengthInputStream)
-        {
-            ((IndefiniteLengthInputStream)_in).setEofOn00(on);
+        if (_in instanceof IndefiniteLengthInputStream) {
+            ((IndefiniteLengthInputStream) _in).setEofOn00(on);
         }
     }
 }

@@ -8,7 +8,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * A padder that adds PKCS7/PKCS5 padding to a block.
  */
 public class PKCS7Padding
-    implements BlockCipherPadding
+        implements BlockCipherPadding
 {
     /**
      * Initialise the padder.
@@ -16,7 +16,7 @@ public class PKCS7Padding
      * @param random - a SecureRandom if available.
      */
     public void init(SecureRandom random)
-        throws IllegalArgumentException
+            throws IllegalArgumentException
     {
         // nothing to do.
     }
@@ -36,13 +36,12 @@ public class PKCS7Padding
      * number of bytes added.
      */
     public int addPadding(
-        byte[]  in,
-        int     inOff)
+            byte[] in,
+            int inOff)
     {
-        byte code = (byte)(in.length - inOff);
+        byte code = (byte) (in.length - inOff);
 
-        while (inOff < in.length)
-        {
+        while (inOff < in.length) {
             in[inOff] = code;
             inOff++;
         }
@@ -54,19 +53,16 @@ public class PKCS7Padding
      * return the number of pad bytes present in the block.
      */
     public int padCount(byte[] in)
-        throws InvalidCipherTextException
+            throws InvalidCipherTextException
     {
         int count = in[in.length - 1] & 0xff;
 
-        if (count > in.length || count == 0)
-        {
+        if (count > in.length || count == 0) {
             throw new InvalidCipherTextException("pad block corrupted");
         }
-        
-        for (int i = 1; i <= count; i++)
-        {
-            if (in[in.length - i] != count)
-            {
+
+        for (int i = 1; i <= count; i++) {
+            if (in[in.length - i] != count) {
                 throw new InvalidCipherTextException("pad block corrupted");
             }
         }

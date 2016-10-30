@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 /**
- * 
  * @deprecated use DERSet
  */
 @SuppressWarnings("unchecked")
 public class DERConstructedSet
-    extends ASN1Set
+        extends ASN1Set
 {
     public DERConstructedSet()
     {
@@ -20,7 +19,7 @@ public class DERConstructedSet
      * @param obj - a single object that makes up the set.
      */
     public DERConstructedSet(
-        DEREncodable   obj)
+            DEREncodable obj)
     {
         this.addObject(obj);
     }
@@ -29,16 +28,15 @@ public class DERConstructedSet
      * @param v - a vector of objects making up the set.
      */
     public DERConstructedSet(
-        DEREncodableVector   v)
+            DEREncodableVector v)
     {
-        for (int i = 0; i != v.size(); i++)
-        {
+        for (int i = 0; i != v.size(); i++) {
             this.addObject(v.get(i));
         }
     }
 
     public void addObject(
-        DEREncodable    obj)
+            DEREncodable obj)
     {
         super.addObject(obj);
     }
@@ -57,23 +55,22 @@ public class DERConstructedSet
      * we also have to specify CONSTRUCTED, and the objects length.
      */
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
-        ByteArrayOutputStream   bOut = new ByteArrayOutputStream();
-        DEROutputStream         dOut = new DEROutputStream(bOut);
-        Enumeration             e = this.getObjects();
+        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+        DEROutputStream dOut = new DEROutputStream(bOut);
+        Enumeration e = this.getObjects();
 
-        while (e.hasMoreElements())
-        {
-            Object    obj = e.nextElement();
+        while (e.hasMoreElements()) {
+            Object obj = e.nextElement();
 
             dOut.writeObject(obj);
         }
 
         dOut.close();
 
-        byte[]  bytes = bOut.toByteArray();
+        byte[] bytes = bOut.toByteArray();
 
         out.writeEncoded(SET | CONSTRUCTED, bytes);
     }

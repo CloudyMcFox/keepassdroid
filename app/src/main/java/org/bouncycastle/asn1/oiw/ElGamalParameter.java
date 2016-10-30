@@ -7,25 +7,25 @@ import org.bouncycastle.asn1.*;
 
 @SuppressWarnings("unchecked")
 public class ElGamalParameter
-    extends ASN1Encodable
+        extends ASN1Encodable
 {
-    DERInteger      p, g;
+    DERInteger p, g;
 
     public ElGamalParameter(
-        BigInteger  p,
-        BigInteger  g)
+            BigInteger p,
+            BigInteger g)
     {
         this.p = new DERInteger(p);
         this.g = new DERInteger(g);
     }
 
     public ElGamalParameter(
-        ASN1Sequence  seq)
+            ASN1Sequence seq)
     {
-        Enumeration     e = seq.getObjects();
+        Enumeration e = seq.getObjects();
 
-        p = (DERInteger)e.nextElement();
-        g = (DERInteger)e.nextElement();
+        p = (DERInteger) e.nextElement();
+        g = (DERInteger) e.nextElement();
     }
 
     public BigInteger getP()
@@ -40,7 +40,7 @@ public class ElGamalParameter
 
     public DERObject toASN1Object()
     {
-        ASN1EncodableVector  v = new ASN1EncodableVector();
+        ASN1EncodableVector v = new ASN1EncodableVector();
 
         v.add(p);
         v.add(g);

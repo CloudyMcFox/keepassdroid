@@ -5,7 +5,7 @@ import java.util.Enumeration;
 
 @SuppressWarnings("unchecked")
 public class BERSet
-    extends DERSet
+        extends DERSet
 {
     /**
      * create an empty sequence
@@ -18,7 +18,7 @@ public class BERSet
      * create a set containing one object
      */
     public BERSet(
-        DEREncodable    obj)
+            DEREncodable obj)
     {
         super(obj);
     }
@@ -27,7 +27,7 @@ public class BERSet
      * @param v - a vector of objects making up the set.
      */
     public BERSet(
-        DEREncodableVector   v)
+            DEREncodableVector v)
     {
         super(v, false);
     }
@@ -36,8 +36,8 @@ public class BERSet
      * @param v - a vector of objects making up the set.
      */
     BERSet(
-        DEREncodableVector   v,
-        boolean              needsSorting)
+            DEREncodableVector v,
+            boolean needsSorting)
     {
         super(v, needsSorting);
     }
@@ -45,25 +45,21 @@ public class BERSet
     /*
      */
     void encode(
-        DEROutputStream out)
-        throws IOException
+            DEROutputStream out)
+            throws IOException
     {
-        if (out instanceof ASN1OutputStream || out instanceof BEROutputStream)
-        {
+        if (out instanceof ASN1OutputStream || out instanceof BEROutputStream) {
             out.write(SET | CONSTRUCTED);
             out.write(0x80);
-            
+
             Enumeration e = getObjects();
-            while (e.hasMoreElements())
-            {
+            while (e.hasMoreElements()) {
                 out.writeObject(e.nextElement());
             }
-        
+
             out.write(0x00);
             out.write(0x00);
-        }
-        else
-        {
+        } else {
             super.encode(out);
         }
     }
