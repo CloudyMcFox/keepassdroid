@@ -21,13 +21,21 @@ package com.keepassdroid;
 
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.AppOpsManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,6 +65,7 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 {
     public static final String KEY_ENTRY = "entry";
     public static final String KEY_MODE = "mode";
+    private static final String TAG = "GroupBaseActivity:";
 
     private SharedPreferences prefs;
 
@@ -231,13 +240,48 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
     private void parseOpenApps()
     {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfo = am.getRunningAppProcesses();
 
-        for (int i = 0; i < runningAppProcessInfo.size(); i++) {
-            if(runningAppProcessInfo.get(i).processName.equals("com.the.app.you.are.looking.for")) {
-                // Do you stuff
-            }
+
+        AppOpsManager appOps = (AppOpsManager)getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow("android:get_usage_stats",
+                android.os.Process.myUid(), getApplicationContext().getPackageName());
+        boolean granted = mode == AppOpsManager.MODE_ALLOWED;
+
+        if (!granted) {
+            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+            dlgAlert.setMessage("Usage permissions needed.\nTo use this feature allow usage access in settings.");
+            dlgAlert.setTitle("Need Permissions");
+            dlgAlert.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener(){
+                        public void onClick(DialogInterface dialog, int whichButton)
+                        {
+                            Intent usageAccessIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                            usageAccessIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(usageAccessIntent);
+                        }
+                    });
+            dlgAlert.setNegativeButton("Cancel", null /*don't do anything on cancel*/);
+            dlgAlert.create().show();
+            // Have to do it this way as marshmallow+ changed getRunningAppProcesses()
+            // to only return current process
+
+            return;
+        }
+
+        // We have permission, look up running tasks.
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
+        long endTime = System.currentTimeMillis();
+        long beginTime = endTime - 1000 * 60 *2;
+
+        // Get usage stats for the last 2 minutes
+        List<UsageStats > stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
+
+        for (int i = 0; i < stats.size(); i++) {
+            //String pkgName = runningAppProcessInfo.get(i).service.getPackageName();
+//            if(runningAppProcessInfo.get(i).processName.equals("com.the.app.you.are.looking.for")) {
+//                // Do you stuff
+//            }
+            Log.i(TAG, stats.get(i).getPackageName());
         }
     }
 
