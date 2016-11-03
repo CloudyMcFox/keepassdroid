@@ -1,6 +1,6 @@
 /*
- * Copyright 2009-2012 Brian Pellin.
- *     
+ * Copyright 2009-2016 Brian Pellin.
+ *
  * This file is part of KeePassDroid.
  *
  *  KeePassDroid is free software: you can redistribute it and/or modify
@@ -19,8 +19,6 @@
  */
 package com.keepassdroid;
 
-
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.AppOpsManager;
 import android.app.usage.UsageStats;
@@ -114,6 +112,7 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        ActivityCompat.invalidateOptionsMenu(this);
 
         setContentView(new GroupViewOnlyView(this));
         setResult(KeePass.EXIT_NORMAL);
@@ -170,7 +169,12 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
     private void setSortMenuText(Menu menu)
     {
-        boolean sortByName = prefs.getBoolean(getString(R.string.sort_key), getResources().getBoolean(R.bool.sort_default));
+        boolean sortByName = false;
+
+        // Will be null if onPrepareOptionsMenu is called before onCreate
+        if (prefs != null) {
+            sortByName = prefs.getBoolean(getString(R.string.sort_key), getResources().getBoolean(R.bool.sort_default));
+        }
 
         int resId;
         if (sortByName) {
@@ -232,7 +236,6 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
             case R.id.menu_openApps:
                 parseOpenApps();
                 return true;
-
         }
 
         return super.onOptionsItemSelected(item);
@@ -240,19 +243,18 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
     private void parseOpenApps()
     {
-
-
-        AppOpsManager appOps = (AppOpsManager)getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
+        AppOpsManager appOps = (AppOpsManager) getApplicationContext().getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow("android:get_usage_stats",
                 android.os.Process.myUid(), getApplicationContext().getPackageName());
         boolean granted = mode == AppOpsManager.MODE_ALLOWED;
 
         if (!granted) {
-            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+            AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
             dlgAlert.setMessage("Usage permissions needed.\nTo use this feature allow usage access in settings.");
             dlgAlert.setTitle("Need Permissions");
             dlgAlert.setPositiveButton("OK",
-                    new DialogInterface.OnClickListener(){
+                    new DialogInterface.OnClickListener()
+                    {
                         public void onClick(DialogInterface dialog, int whichButton)
                         {
                             Intent usageAccessIntent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
@@ -269,12 +271,12 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
         }
 
         // We have permission, look up running tasks.
-        UsageStatsManager mUsageStatsManager = (UsageStatsManager)getSystemService(Context.USAGE_STATS_SERVICE);
+        UsageStatsManager mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
         long endTime = System.currentTimeMillis();
-        long beginTime = endTime - 1000 * 60 *2;
+        long beginTime = endTime - 1000 * 60 * 2;
 
         // Get usage stats for the last 2 minutes
-        List<UsageStats > stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
+        List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
 
         for (int i = 0; i < stats.size(); i++) {
             //String pkgName = runningAppProcessInfo.get(i).service.getPackageName();
@@ -284,7 +286,6 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
             Log.i(TAG, stats.get(i).getPackageName());
         }
     }
-
 
     private void toggleSort()
     {
@@ -355,5 +356,4 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
         }
 
     }
-
 }

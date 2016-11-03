@@ -1,4 +1,7 @@
-droid (2.0.6.2)
+KeePassDroid (2.0.6.3)
+ * Fix various crashes
+
+
  * Fix launch immediately from nfd
  * Updated German translations from MaDill
  * Add Portugese (Portugal) translations from YSmhXQDd6Z

@@ -92,8 +92,11 @@ public class PasswordActivity extends LockingActivity
         Launch(act, fileName, "");
     }
 
-    public static void Launch(Activity act, String fileName, String keyFile) throws FileNotFoundException
-    {
+    public static void Launch(Activity act, String fileName, String keyFile) throws FileNotFoundException {
+        if (EmptyUtils.isNullOrEmpty(fileName)) {
+            throw new FileNotFoundException();
+        }
+
         Uri uri = UriUtil.parseDefaultFile(fileName);
         String scheme = uri.getScheme();
 
@@ -196,7 +199,7 @@ public class PasswordActivity extends LockingActivity
     private void retrieveSettings()
     {
         String defaultFilename = prefs.getString(KEY_DEFAULT_FILENAME, "");
-        if (mDbUri.getPath().length() > 0 && UriUtil.equalsDefaultfile(mDbUri, defaultFilename)) {
+        if (!EmptyUtils.isNullOrEmpty(mDbUri.getPath()) && UriUtil.equalsDefaultfile(mDbUri, defaultFilename)) {
             CheckBox checkbox = (CheckBox) findViewById(R.id.default_database);
             checkbox.setChecked(true);
         }
