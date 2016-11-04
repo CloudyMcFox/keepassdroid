@@ -57,7 +57,7 @@ public class SearchDbHelper
 
     }
 
-    public PwGroup search(Database db, String qStr)
+    public PwGroup search(Database db, ArrayList<String> qStrList)
     {
         PwDatabase pm = db.pm;
 
@@ -74,8 +74,8 @@ public class SearchDbHelper
         group.childEntries = new ArrayList<PwEntry>();
 
         // Search all entries
+
         Locale loc = Locale.getDefault();
-        qStr = qStr.toLowerCase(loc);
         boolean isOmitBackup = omitBackup();
 
         Queue<PwGroup> worklist = new LinkedList<PwGroup>();
@@ -88,7 +88,10 @@ public class SearchDbHelper
 
             if (pm.isGroupSearchable(top, isOmitBackup)) {
                 for (PwEntry entry : top.childEntries) {
-                    processEntries(entry, group.childEntries, qStr, loc);
+                    for (String qStr : qStrList) {
+                        qStr = qStr.toLowerCase(loc).trim();
+                        processEntries(entry, group.childEntries, qStr, loc);
+                    }
                 }
 
                 for (PwGroup childGroup : top.childGroups) {

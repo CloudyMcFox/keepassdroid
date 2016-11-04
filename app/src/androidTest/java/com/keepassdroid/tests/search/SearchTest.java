@@ -30,6 +30,8 @@ import com.keepassdroid.Database;
 import com.keepassdroid.database.PwGroup;
 import com.keepassdroid.tests.database.TestData;
 
+import java.util.ArrayList;
+
 public class SearchTest extends AndroidTestCase {
 	
 	private Database mDb;
@@ -42,21 +44,27 @@ public class SearchTest extends AndroidTestCase {
 	}
 	
 	public void testSearch() {
-		PwGroup results = mDb.Search("Amazon");
+		ArrayList<String> strList = new ArrayList<>();
+		strList.add("Amazon");
+		PwGroup results = mDb.Search(strList);
 		assertTrue("Search result not found.", results.childEntries.size() > 0);
 		
 	}
 	
 	public void testBackupIncluded() {
 		updateOmitSetting(false);
-		PwGroup results = mDb.Search("BackupOnly");
+		ArrayList<String> strList = new ArrayList<>();
+		strList.add("BackupOnly");
+		PwGroup results = mDb.Search(strList);
 		
 		assertTrue("Search result not found.", results.childEntries.size() > 0);
 	}
 	
 	public void testBackupExcluded() {
 		updateOmitSetting(true);
-		PwGroup results = mDb.Search("BackupOnly");
+		ArrayList<String> strList = new ArrayList<>();
+		strList.add("BackupOnly");
+		PwGroup results = mDb.Search(strList);
 		
 		assertFalse("Search result found, but should not have been.", results.childEntries.size() > 0);
 	}

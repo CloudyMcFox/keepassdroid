@@ -19,6 +19,7 @@
  */
 package com.keepassdroid.tests.database;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -71,8 +72,12 @@ public class DeleteEntry extends AndroidTestCase {
 		
 		// Verify the entries were removed from the search index
 		SearchDbHelper dbHelp = new SearchDbHelper(ctx);
-		PwGroup results1 = dbHelp.search(db, ENTRY1_NAME);
-		PwGroup results2 = dbHelp.search(db, ENTRY2_NAME);
+		ArrayList<String> strList1 = new ArrayList<>();
+		strList1.add(ENTRY1_NAME);
+		ArrayList<String> strList2 = new ArrayList<>();
+		strList2.add(ENTRY2_NAME);
+		PwGroup results1 = dbHelp.search(db, strList1);
+		PwGroup results2 = dbHelp.search(db, strList2);
 		
 		assertEquals("Entry1 was not removed from the search results", 0, results1.childEntries.size());
 		assertEquals("Entry2 was not removed from the search results", 0, results2.childEntries.size());

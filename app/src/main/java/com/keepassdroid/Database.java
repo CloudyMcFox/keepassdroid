@@ -28,10 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.SyncFailedException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import android.content.ContentResolver;
+
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -161,13 +162,13 @@ public class Database
         loaded = true;
     }
 
-    public PwGroup Search(String str)
+    public PwGroup Search(ArrayList<String> strList)
     {
         if (searchHelper == null) {
             return null;
         }
 
-        PwGroup group = searchHelper.search(this, str);
+        PwGroup group = searchHelper.search(this, strList);
 
         return group;
 

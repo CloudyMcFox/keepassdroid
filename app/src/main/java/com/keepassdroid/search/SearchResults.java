@@ -31,6 +31,8 @@ import com.keepassdroid.app.App;
 import com.keepassdroid.view.GroupEmptyView;
 import com.keepassdroid.view.GroupViewOnlyView;
 
+import java.util.ArrayList;
+
 public class SearchResults extends GroupBaseActivity
 {
 
@@ -46,8 +48,6 @@ public class SearchResults extends GroupBaseActivity
             return;
         }
 
-        setResult(KeePass.EXIT_NORMAL);
-
         mDb = App.getDB();
 
         // Likely the app has been killed exit the activity
@@ -55,16 +55,30 @@ public class SearchResults extends GroupBaseActivity
             finish();
         }
 
-        performSearch(getSearchStr(getIntent()));
+        setResult(KeePass.EXIT_NORMAL);
 
+        // First checked if we passed an arrayList (not a search but coming from paring open apps)
+        Bundle extrasBundle = getIntent().getExtras();
+        boolean hasList = false;
+        if (!extrasBundle.isEmpty()) {
+            hasList = extrasBundle.containsKey("queryList");
+        }
+        ArrayList<String> strList;
+        if (hasList){
+            strList = extrasBundle.getStringArrayList("queryList");
+        } else {
+            strList = new ArrayList<>();
+            strList.add(getSearchStr(getIntent()));
+        }
+        performSearch(strList);
     }
 
-    private void performSearch(String query)
+    private void performSearch(ArrayList<String> query)
     {
-        query(query.trim());
+        query(query);
     }
 
-    private void query(String query)
+    private void query(ArrayList<String> query)
     {
         mGroup = mDb.Search(query);
 

@@ -21,6 +21,7 @@ package com.keepassdroid;
 
 import android.app.AlertDialog;
 import android.app.AppOpsManager;
+import android.app.usage.UsageEvents;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.ActivityNotFoundException;
@@ -52,11 +53,13 @@ import com.keepassdroid.compat.ActivityCompat;
 import com.keepassdroid.compat.EditorCompat;
 import com.keepassdroid.database.PwGroup;
 import com.keepassdroid.database.edit.OnFinish;
+import com.keepassdroid.search.SearchResults;
 import com.keepassdroid.settings.AppSettingsActivity;
 import com.keepassdroid.utils.Util;
 import com.keepassdroid.view.ClickView;
 import com.keepassdroid.view.GroupViewOnlyView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GroupBaseActivity extends LockCloseListActivity
@@ -272,19 +275,41 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
         // We have permission, look up running tasks.
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+//        long endTime = System.currentTimeMillis();
+//        long beginTime = endTime - 1000 * 60 * 2;
+//
+//        // Get usage stats for the last 2 minutes
+//        List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
         long endTime = System.currentTimeMillis();
-        long beginTime = endTime - 1000 * 60 * 2;
-
-        // Get usage stats for the last 2 minutes
-        List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
-
-        for (int i = 0; i < stats.size(); i++) {
-            //String pkgName = runningAppProcessInfo.get(i).service.getPackageName();
-//            if(runningAppProcessInfo.get(i).processName.equals("com.the.app.you.are.looking.for")) {
-//                // Do you stuff
-//            }
-            Log.i(TAG, stats.get(i).getPackageName());
+        long beginTime = endTime - 1000 * 60 * 2; // apps opened in the last 2 min
+        UsageEvents usageEvents = mUsageStatsManager.queryEvents(beginTime, endTime);
+        UsageEvents.Event event = new UsageEvents.Event();
+        ArrayList<String> appsSearchList = new ArrayList<>();
+        while (usageEvents.hasNextEvent()) {
+            usageEvents.getNextEvent(event);
+            // split on the dots and remove "com" and "android"
+            String[] appNameSplit = event.getPackageName().split("\\.");
+            for(String str : appNameSplit) {
+                if (!str.equals("com") && !str.equals("android")){
+                    if (!appsSearchList.contains(str)){
+                        appsSearchList.add(str);
+                    }
+                }
+            }
         }
+//        ArrayList<String> appsSearchList = new ArrayList<>();
+//        for (int i = 0; i < stats.size(); i++) {
+//            // split on the dots and remove "com" and "android"
+//            String[] appNameSplit = stats.get(i).getPackageName().split("\\.");
+//            for(String str : appNameSplit) {
+//                if (!str.equals("com") && !str.equals("android")){
+//                    appsSearchList.add(str);
+//                }
+//            }
+//        }
+        Intent i = new Intent(this, SearchResults.class);
+        i.putStringArrayListExtra("queryList", appsSearchList);
+        this.startActivity(i);
     }
 
     private void toggleSort()
