@@ -244,7 +244,9 @@ public class EntryActivity extends LockCloseHideActivity
         Intent intent = new Intent(intentText);
         PendingIntent pending = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        notify.setLatestEventInfo(this, getString(R.string.app_name), desc, pending);
+        // Cant have this in API 23,
+        //TODO:figure out alternative?
+        //notify.setLatestEventInfo(this, getString(R.string.app_name), desc, pending);
 
         return notify;
     }

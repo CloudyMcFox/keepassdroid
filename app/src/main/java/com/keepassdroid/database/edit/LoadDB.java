@@ -48,8 +48,9 @@ public class LoadDB extends RunnableOnFinish
     private Database mDb;
     private Context mCtx;
     private boolean mRememberKeyfile;
+    private boolean mEnrollFingerPrint;
 
-    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish)
+    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish, boolean fEnrollFingerprint)
     {
         super(finish);
 
@@ -58,7 +59,8 @@ public class LoadDB extends RunnableOnFinish
         mUri = uri;
         mPass = pass;
         mKey = key;
-
+        mEnrollFingerPrint = fEnrollFingerprint;
+        // Get pw here if we logged in with FP?
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         mRememberKeyfile = prefs.getBoolean(ctx.getString(R.string.keyfile_key), ctx.getResources().getBoolean(R.bool.keyfile_default));
     }
@@ -108,6 +110,8 @@ public class LoadDB extends RunnableOnFinish
             finish(false, mCtx.getString(R.string.error_out_of_memory));
             return;
         }
+
+        // succeeded, so store PW if we wanted to enroll FP
 
         finish(true);
     }

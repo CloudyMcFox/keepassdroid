@@ -19,14 +19,19 @@
  */
 package com.keepassdroid;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -50,6 +55,7 @@ import android.widget.Toast;
 import com.android.keepass.KeePass;
 import com.android.keepass.R;
 import com.keepassdroid.app.App;
+import com.keepassdroid.compat.ActivityCompat;
 import com.keepassdroid.compat.BackupManagerCompat;
 import com.keepassdroid.compat.ClipDataCompat;
 import com.keepassdroid.compat.EditorCompat;
@@ -85,6 +91,7 @@ public class PasswordActivity extends LockingActivity
     private Uri mDbUri = null;
     private Uri mKeyUri = null;
     private boolean mRememberKeyfile;
+    private boolean m_fHasValidFingerPrintEnroll;
     SharedPreferences prefs;
 
     public static void Launch(Activity act, String fileName) throws FileNotFoundException
@@ -175,6 +182,8 @@ public class PasswordActivity extends LockingActivity
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         mRememberKeyfile = prefs.getBoolean(getString(R.string.keyfile_key), getResources().getBoolean(R.bool.keyfile_default));
+
+        m_fHasValidFingerPrintEnroll = prefs.getBoolean(getString(R.string.keyfile_key), getResources().getBoolean(R.bool.valid_fingerprint_enrolled));
         setContentView(R.layout.password);
 
         new InitTask().execute(i);
@@ -222,6 +231,36 @@ public class PasswordActivity extends LockingActivity
 
         String key = (mKeyUri == null) ? "" : mKeyUri.toString();
         setEditText(R.id.pass_keyfile, key);
+
+        boolean fCanEnrollFingerPrint = true;
+        if (this.checkSelfPermission( Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Fingerprint authentication permission not enabled", Toast.LENGTH_LONG).show();
+            fCanEnrollFingerPrint = false;
+        }
+
+
+        if (fCanEnrollFingerPrint) {
+            FingerprintManager fingerprintManager =
+                    (FingerprintManager) getSystemService(FINGERPRINT_SERVICE);
+            // Has valid fingerprint to authenticate with:
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                //Fingerprint API only available on from Android 6.0 (M)
+                if (!fingerprintManager.isHardwareDetected()) {
+                    // Device doesn't support fingerprint authentication
+                    fCanEnrollFingerPrint = false;
+                } else if (!fingerprintManager.hasEnrolledFingerprints()) {
+                    // User hasn't enrolled any fingerprints to authenticate with
+                    fCanEnrollFingerPrint = false;
+                }
+            }
+        }
+
+        // if already has a valid fingerprint or doesn't have the ability to enroll fingerprint disable the option
+        if (!fCanEnrollFingerPrint || m_fHasValidFingerPrintEnroll) {
+            CheckBox cbFingerPrint = (CheckBox) findViewById(R.id.cbFingerPrintEnroll);
+            cbFingerPrint.setEnabled(false);
+            cbFingerPrint.setVisibility(View.INVISIBLE);
+        }
     }
 
     /*
@@ -268,18 +307,25 @@ public class PasswordActivity extends LockingActivity
 
         public void onClick(View view)
         {
+            // Handle Enroll fingerprint (need to move to after PW?)
+            boolean fEnrollFingerprint = false;
+            CheckBox cbFingerPrint = (CheckBox) findViewById(R.id.cbFingerPrintEnroll);
+            if (cbFingerPrint.isEnabled() && View.VISIBLE == cbFingerPrint.getVisibility() && cbFingerPrint.isChecked()) {
+                fEnrollFingerprint = true;
+            }
+
             String pass = getEditText(R.id.password);
             String key = getEditText(R.id.pass_keyfile);
-            loadDatabase(pass, key);
+            loadDatabase(pass, key, fEnrollFingerprint);
         }
     }
 
-    private void loadDatabase(String pass, String keyfile)
+    private void loadDatabase(String pass, String keyfile, boolean fEnrollFingerprint)
     {
-        loadDatabase(pass, UriUtil.parseDefaultFile(keyfile));
+        loadDatabase(pass, UriUtil.parseDefaultFile(keyfile), fEnrollFingerprint);
     }
 
-    private void loadDatabase(String pass, Uri keyfile)
+    private void loadDatabase(String pass, Uri keyfile, boolean fEnrollFingerprint)
     {
         if (pass.length() == 0 && (keyfile == null || keyfile.toString().length() == 0)) {
             errorMessage(R.string.error_nopass);
@@ -294,7 +340,7 @@ public class PasswordActivity extends LockingActivity
         App.clearShutdown();
 
         Handler handler = new Handler();
-        LoadDB task = new LoadDB(db, PasswordActivity.this, mDbUri, pass, keyfile, new AfterLoad(handler, db));
+        LoadDB task = new LoadDB(db, PasswordActivity.this, mDbUri, pass, keyfile, new AfterLoad(handler, db), fEnrollFingerprint);
         ProgressTask pt = new ProgressTask(PasswordActivity.this, task, R.string.loading_database);
         pt.run();
     }
@@ -537,7 +583,7 @@ public class PasswordActivity extends LockingActivity
             retrieveSettings();
 
             if (launch_immediately)
-                loadDatabase(password, mKeyUri);
+                loadDatabase(password, mKeyUri, false);
         }
     }
 }

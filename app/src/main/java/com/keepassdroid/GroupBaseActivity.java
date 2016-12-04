@@ -275,11 +275,6 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
 
         // We have permission, look up running tasks.
         UsageStatsManager mUsageStatsManager = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
-//        long endTime = System.currentTimeMillis();
-//        long beginTime = endTime - 1000 * 60 * 2;
-//
-//        // Get usage stats for the last 2 minutes
-//        List<UsageStats> stats = mUsageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, beginTime, endTime);
         long endTime = System.currentTimeMillis();
         long beginTime = endTime - 1000 * 60 * 2; // apps opened in the last 2 min
         UsageEvents usageEvents = mUsageStatsManager.queryEvents(beginTime, endTime);
