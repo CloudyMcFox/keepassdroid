@@ -69,7 +69,7 @@ public class LoadDB extends RunnableOnFinish
         if (fFingerprintLogInSuccess) {
             // decrypt pass
             try {
-                String base64EncryptedPassword = mPrefs.getString(mFileName + mCtx.getString(R.string.encrypted_pass), null);
+                String base64EncryptedPassword = pass;
                 byte[] encryptedPassword = Base64.decode(base64EncryptedPassword, Base64.DEFAULT);
                 PasswordActivity passwordActCtx = (PasswordActivity) mCtx;
                 byte[] passwordBytes = passwordActCtx.getCipher().doFinal(encryptedPassword);
@@ -138,7 +138,6 @@ public class LoadDB extends RunnableOnFinish
            try {
                // Encrypt Pass
                PasswordActivity passCtx = (PasswordActivity) mCtx;
-               //byte[] encryptionIv = passCtx.getCipher().getIV();
                byte[] passwordBytes = mPass.getBytes(CHARSET_NAME);
                byte[] encryptedPasswordBytes =  passCtx.getCipher().doFinal(passwordBytes);
                String encryptedPassword = Base64.encodeToString(encryptedPasswordBytes, Base64.DEFAULT);

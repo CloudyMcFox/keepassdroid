@@ -109,6 +109,7 @@ public class PasswordActivity extends LockingActivity
     private static final int FILE_BROWSE = 256;
     public static final int GET_CONTENT = 257;
     private static final int OPEN_DOC = 258;
+    public static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 259;
 
     private Uri mDbUri = null;
     private Uri mKeyUri = null;
@@ -332,14 +333,14 @@ public class PasswordActivity extends LockingActivity
             if (initCipher(fEnroll)) {
                 mCryptoObject = new FingerprintManager.CryptoObject(mCipher);
 
-                if (!fInitCipherOnly) {
-                    FingerPrintDialogFragment fragment
-                            = new FingerPrintDialogFragment();
-                    Bundle args = new Bundle();
-                    args.putBoolean("enroll", fEnroll);
-                    fragment.setArguments(args);
+                    if (!fInitCipherOnly) {
+                        FingerPrintDialogFragment fragment
+                                = new FingerPrintDialogFragment();
+                        Bundle args = new Bundle();
+                        args.putBoolean("enroll", fEnroll);
+                        fragment.setArguments(args);
 
-                    fragment.setCryptoObject(mCryptoObject);
+                        fragment.setCryptoObject(mCryptoObject);
                     fragment.show(getFragmentManager(), "DIALOG_FRAGMENT");
                 }
             }
@@ -352,9 +353,9 @@ public class PasswordActivity extends LockingActivity
     {
         // get PW and load
         // If authenticated then get pw. (move this to post authentication)
-        String encPass = prefs.getString(mDbFileName + getString(R.string.encrypted_pass), null);
 
         if (!fEnrolling) {
+            String encPass = prefs.getString(mDbFileName + getString(R.string.encrypted_pass), null);
             loadDatabase(encPass, mKeyUri, false, true);
         } else {
             loadDatabase(getEditText(R.id.password), mKeyUri, true /*enroll*/, false);
@@ -702,15 +703,15 @@ public class PasswordActivity extends LockingActivity
                 mCipher.init(Cipher.ENCRYPT_MODE, key);
                 byte[] encryptionIv = mCipher.getIV();
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString("encryptionIv", Base64.encodeToString(encryptionIv, Base64.DEFAULT));
-                editor.apply();
                 // store IV
+                editor.putString(mDbFileName + "encryptionIv", Base64.encodeToString(encryptionIv, Base64.DEFAULT));
+                editor.apply();
             } else {
                 KeyStore keyStore = KeyStore.getInstance(KEY_STORE);
                 keyStore.load(null);
-                SecretKey key = (SecretKey) keyStore.getKey(FINGERPRINT_KEY_NAME, null);
+                SecretKey key = (SecretKey) keyStore.getKey(mDbFileName + FINGERPRINT_KEY_NAME, null);
                 mCipher = Cipher.getInstance(TRANSFORMATION);
-                String base64EncryptionIv = prefs.getString("encryptionIv", null);
+                String base64EncryptionIv = prefs.getString(mDbFileName + "encryptionIv", null);
                 byte[] encryptionIv = Base64.decode(base64EncryptionIv, Base64.DEFAULT);
                 mCipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(encryptionIv));
             }
@@ -721,7 +722,7 @@ public class PasswordActivity extends LockingActivity
         } catch (KeyStoreException | UserNotAuthenticatedException e) {
             Intent intent = mKeyguardManager.createConfirmDeviceCredentialIntent(null, null);
             if (intent != null) {
-                startActivityForResult(intent, KeePass.REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
+                startActivityForResult(intent, REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS);
             }
             return false;
         } catch (CertificateException | UnrecoverableKeyException | IOException
@@ -734,7 +735,7 @@ public class PasswordActivity extends LockingActivity
     private SecretKey createKey() {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_STORE);
-            keyGenerator.init(new KeyGenParameterSpec.Builder(FINGERPRINT_KEY_NAME,
+            keyGenerator.init(new KeyGenParameterSpec.Builder(mDbFileName + FINGERPRINT_KEY_NAME,
                     KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setUserAuthenticationRequired(true)

@@ -32,7 +32,7 @@ public class KeePass extends Activity
     public static final int EXIT_LOCK = 1;
     public static final int EXIT_REFRESH = 2;
     public static final int EXIT_REFRESH_TITLE = 3;
-    public static final int REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 4;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
