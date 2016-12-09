@@ -26,9 +26,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 
 import com.android.keepass.R;
 import com.keepassdroid.Database;
+import com.keepassdroid.PasswordActivity;
 import com.keepassdroid.app.App;
 import com.keepassdroid.database.exception.ArcFourException;
 import com.keepassdroid.database.exception.ContentFileNotFoundException;
@@ -43,26 +45,46 @@ import com.keepassdroid.database.exception.KeyFileEmptyException;
 public class LoadDB extends RunnableOnFinish
 {
     private Uri mUri;
+    private String mFileName;
     private String mPass;
     private Uri mKey;
     private Database mDb;
     private Context mCtx;
     private boolean mRememberKeyfile;
     private boolean mEnrollFingerPrint;
+    private SharedPreferences mPrefs;
 
-    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish, boolean fEnrollFingerprint)
+    public static final String CHARSET_NAME = "UTF-8";
+
+
+    public LoadDB(Database db, Context ctx, Uri uri, String pass, Uri key, OnFinish finish, boolean fEnrollFingerprint, boolean fFingerprintLogInSuccess)
     {
         super(finish);
-
+        assert(!fEnrollFingerprint || !fFingerprintLogInSuccess);
         mDb = db;
         mCtx = ctx;
         mUri = uri;
-        mPass = pass;
+        mFileName = uri.toString().substring( uri.toString().lastIndexOf('/')+1, uri.toString().length() );
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        if (fFingerprintLogInSuccess) {
+            // decrypt pass
+            try {
+                String base64EncryptedPassword = mPrefs.getString(mFileName + mCtx.getString(R.string.encrypted_pass), null);
+                byte[] encryptedPassword = Base64.decode(base64EncryptedPassword, Base64.DEFAULT);
+                PasswordActivity passwordActCtx = (PasswordActivity) mCtx;
+                byte[] passwordBytes = passwordActCtx.getCipher().doFinal(encryptedPassword);
+                String password = new String(passwordBytes, CHARSET_NAME);
+                mPass = password;
+            } catch (Exception e) {
+                // log here
+                mPass = pass;
+            }
+        } else {
+            mPass = pass;
+        }
         mKey = key;
         mEnrollFingerPrint = fEnrollFingerprint;
-        // Get pw here if we logged in with FP?
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-        mRememberKeyfile = prefs.getBoolean(ctx.getString(R.string.keyfile_key), ctx.getResources().getBoolean(R.bool.keyfile_default));
+        mRememberKeyfile = mPrefs.getBoolean(ctx.getString(R.string.keyfile_key), ctx.getResources().getBoolean(R.bool.keyfile_default));
     }
 
     @Override
@@ -112,7 +134,26 @@ public class LoadDB extends RunnableOnFinish
         }
 
         // succeeded, so store PW if we wanted to enroll FP
+        if (mEnrollFingerPrint) {
+           try {
+               // Encrypt Pass
+               PasswordActivity passCtx = (PasswordActivity) mCtx;
+               //byte[] encryptionIv = passCtx.getCipher().getIV();
+               byte[] passwordBytes = mPass.getBytes(CHARSET_NAME);
+               byte[] encryptedPasswordBytes =  passCtx.getCipher().doFinal(passwordBytes);
+               String encryptedPassword = Base64.encodeToString(encryptedPasswordBytes, Base64.DEFAULT);
 
+               SharedPreferences.Editor editor = mPrefs.edit();
+               editor.putString(mFileName + mCtx.getString(R.string.encrypted_pass), encryptedPassword);
+               //editor.putString(mFileName + mCtx.getString(R.string.encryption_iv), Base64.encodeToString(encryptionIv, Base64.DEFAULT));
+               editor.putBoolean(mFileName + mCtx.getString(R.string.fingerprint_enrolled_key), true);
+               editor.apply();
+           } catch (Exception e) {
+               // best effort
+               // log here
+               mPrefs.edit().putBoolean(mFileName + mCtx.getString(R.string.fingerprint_enrolled_key), false).apply();
+           }
+        }
         finish(true);
     }
 

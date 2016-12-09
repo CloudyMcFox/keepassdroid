@@ -40,6 +40,9 @@
     <string name="app_timeout_key">app_timeout_key</string>
     <string name="clipboard_timeout_key">clip_timeout_key</string>
     <string name="db_key">db</string>
+    <string name="encrypted_pass">encrypted_password</string>
+    <string name="encryption_iv">encryption_iv</string>
+    <string name="fingerprint_enrolled_key">fingerprint_enrolled</string>
     <string name="rounds_key">rounds</string>
     <string name="keyfile_key">keyfile</string>
     <string name="maskpass_key">maskpass</string>
@@ -57,7 +60,7 @@
     <bool name="omitbackup_default">true</bool>
     <bool name="recentfile_default">true</bool>
     <bool name="saf_default">false</bool>
-    <bool name="valid_fingerprint_enrolled">false</bool>
+    <bool name="valid_fingerprint_enrolled_default">false</bool>
     
     <string name="clipboard_timeout_default">300000</string>
     <string-array name="clipboard_timeout_values">
