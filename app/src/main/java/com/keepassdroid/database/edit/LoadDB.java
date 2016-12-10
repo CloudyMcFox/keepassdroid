@@ -144,7 +144,6 @@ public class LoadDB extends RunnableOnFinish
 
                SharedPreferences.Editor editor = mPrefs.edit();
                editor.putString(mFileName + mCtx.getString(R.string.encrypted_pass), encryptedPassword);
-               //editor.putString(mFileName + mCtx.getString(R.string.encryption_iv), Base64.encodeToString(encryptionIv, Base64.DEFAULT));
                editor.putBoolean(mFileName + mCtx.getString(R.string.fingerprint_enrolled_key), true);
                editor.apply();
            } catch (Exception e) {

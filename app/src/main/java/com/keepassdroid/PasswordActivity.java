@@ -95,7 +95,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import java.security.cert.CertificateException;
-
 public class PasswordActivity extends LockingActivity
 {
 
@@ -303,7 +302,40 @@ public class PasswordActivity extends LockingActivity
                 }
             }
         }
-
+        CheckBox cbFingerPrint = (CheckBox) findViewById(R.id.cbFingerPrintEnroll);
+        cbFingerPrint.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(final CompoundButton buttonView, boolean isChecked)
+            {
+                if (!isChecked && m_fHasValidFingerPrintEnroll) {
+                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(PasswordActivity.this);
+                    dlgAlert.setPositiveButton("Ok",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    SharedPreferences.Editor edit = prefs.edit();
+                                    edit.remove(mDbFileName + getString(R.string.fingerprint_enrolled_key));
+                                    edit.remove(mDbFileName + getString(R.string.encrypted_pass));
+                                    edit.remove(mDbFileName + getString(R.string.encryption_iv));
+                                    edit.apply();
+                                    buttonView.setChecked(false);
+                                    ImageButton ibFingerPrint = (ImageButton) findViewById(R.id.fingerprint_button);
+                                    ibFingerPrint.setEnabled(false);
+                                    ibFingerPrint.setVisibility(View.INVISIBLE);
+                                }
+                            });
+                    dlgAlert.setMessage("Are you sure you want to un-enroll your fingerprint?");
+                    dlgAlert.setTitle("Un-enroll Fingerprint");
+                    dlgAlert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            buttonView.setChecked(true);
+                        }
+                    });
+                    dlgAlert.setCancelable(true);
+                    dlgAlert.create().show();
+                }
+            }
+        });
         // if already has a valid fingerprint or doesn't have the ability to enroll fingerprint disable the option
         if (m_fHasValidFingerPrintEnroll) {
             ibFingerPrint.setEnabled(true);
@@ -311,16 +343,21 @@ public class PasswordActivity extends LockingActivity
         }
         if (!fCanEnrollFingerPrint) {
             // set fingerprint enrolled pref to false to reset if fingerprint in system is removed
-            prefs.edit().putBoolean(mDbFileName + getString(R.string.fingerprint_enrolled_key), false).apply();
+            SharedPreferences.Editor edit = prefs.edit();
+            edit.remove(mDbFileName + getString(R.string.fingerprint_enrolled_key));
+            edit.remove(mDbFileName + getString(R.string.encrypted_pass));
+            edit.remove(mDbFileName + getString(R.string.encryption_iv));
+            edit.apply();
+            m_fHasValidFingerPrintEnroll = false;
         }
 
-        if (!fCanEnrollFingerPrint || m_fHasValidFingerPrintEnroll) {
-            CheckBox cbFingerPrint = (CheckBox) findViewById(R.id.cbFingerPrintEnroll);
+        if (!fCanEnrollFingerPrint) {
             cbFingerPrint.setEnabled(false);
             cbFingerPrint.setVisibility(View.INVISIBLE);
         }
         if (fCanEnrollFingerPrint && m_fHasValidFingerPrintEnroll){
             // fingerprint enrolled and ready
+            cbFingerPrint.setChecked(true);
             FingerprintScan(false, false);
         }
     }
@@ -329,7 +366,6 @@ public class PasswordActivity extends LockingActivity
     {
         // try catch this
         try {
-
             if (initCipher(fEnroll)) {
                 mCryptoObject = new FingerprintManager.CryptoObject(mCipher);
 
@@ -710,10 +746,10 @@ public class PasswordActivity extends LockingActivity
                 byte[] encryptionIv = mCipher.getIV();
                 SharedPreferences.Editor editor = prefs.edit();
                 // store IV
-                editor.putString(mDbFileName + "encryptionIv", Base64.encodeToString(encryptionIv, Base64.DEFAULT));
+                editor.putString(mDbFileName + getString(R.string.encryption_iv), Base64.encodeToString(encryptionIv, Base64.DEFAULT));
                 editor.apply();
             } else {
-                String base64EncryptionIv = prefs.getString(mDbFileName + "encryptionIv", null);
+                String base64EncryptionIv = prefs.getString(mDbFileName + getString(R.string.encryption_iv), null);
                 assert(null != base64EncryptionIv);
                 byte[] encryptionIv = Base64.decode(base64EncryptionIv, Base64.DEFAULT);
                 mCipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(encryptionIv));
