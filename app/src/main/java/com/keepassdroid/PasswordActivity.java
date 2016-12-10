@@ -697,9 +697,15 @@ public class PasswordActivity extends LockingActivity
     private boolean initCipher(boolean fEnroll)
     {
         try {
+            KeyStore keyStore = KeyStore.getInstance(KEY_STORE);
+            keyStore.load(null);
+            SecretKey key = (SecretKey) keyStore.getKey(FINGERPRINT_KEY_NAME, null);
+            if (null == key) { // No fingerprint ever enrolled
+                key = createKey(FINGERPRINT_KEY_NAME);
+            }
+
+            mCipher = Cipher.getInstance(TRANSFORMATION);
             if (fEnroll) {
-                SecretKey key = createKey();
-                mCipher = Cipher.getInstance(TRANSFORMATION);
                 mCipher.init(Cipher.ENCRYPT_MODE, key);
                 byte[] encryptionIv = mCipher.getIV();
                 SharedPreferences.Editor editor = prefs.edit();
@@ -707,15 +713,11 @@ public class PasswordActivity extends LockingActivity
                 editor.putString(mDbFileName + "encryptionIv", Base64.encodeToString(encryptionIv, Base64.DEFAULT));
                 editor.apply();
             } else {
-                KeyStore keyStore = KeyStore.getInstance(KEY_STORE);
-                keyStore.load(null);
-                SecretKey key = (SecretKey) keyStore.getKey(mDbFileName + FINGERPRINT_KEY_NAME, null);
-                mCipher = Cipher.getInstance(TRANSFORMATION);
                 String base64EncryptionIv = prefs.getString(mDbFileName + "encryptionIv", null);
+                assert(null != base64EncryptionIv);
                 byte[] encryptionIv = Base64.decode(base64EncryptionIv, Base64.DEFAULT);
                 mCipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(encryptionIv));
             }
-
             return true;
         } catch (KeyPermanentlyInvalidatedException e) {
             return false;
@@ -732,10 +734,10 @@ public class PasswordActivity extends LockingActivity
         }
     }
 
-    private SecretKey createKey() {
+    private SecretKey createKey(String keyName) {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_STORE);
-            keyGenerator.init(new KeyGenParameterSpec.Builder(mDbFileName + FINGERPRINT_KEY_NAME,
+            keyGenerator.init(new KeyGenParameterSpec.Builder(keyName,
                     KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setUserAuthenticationRequired(true)
