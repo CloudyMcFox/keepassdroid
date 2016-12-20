@@ -124,11 +124,9 @@ public class PasswordActivity extends LockingActivity
     public static final String TRANSFORMATION = KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/"
             + KeyProperties.ENCRYPTION_PADDING_PKCS7;
     public static final String KEY_STORE = "AndroidKeyStore";
-    public static final int AUTHENTICATION_DURATION_SECONDS = 30;
+    public static final int AUTHENTICATION_DURATION_SECONDS = 30 * 60;
     private KeyguardManager mKeyguardManager;
-
     private FingerprintManager.CryptoObject mCryptoObject;
-
 
     public static void Launch(Activity act, String fileName) throws FileNotFoundException
     {
@@ -364,7 +362,6 @@ public class PasswordActivity extends LockingActivity
 
     private void FingerprintScan(boolean fInitCipherOnly, boolean fEnroll)
     {
-        // try catch this
         try {
             if (initCipher(fEnroll)) {
                 mCryptoObject = new FingerprintManager.CryptoObject(mCipher);
@@ -381,7 +378,7 @@ public class PasswordActivity extends LockingActivity
                 }
             }
         } catch (Exception e) {
-            // Log this123
+            // Log this
         }
     }
 
@@ -416,9 +413,7 @@ public class PasswordActivity extends LockingActivity
         public void onCheckedChanged(CompoundButton buttonView,
                                      boolean isChecked)
         {
-
             String newDefaultFileName;
-
             if (isChecked) {
                 newDefaultFileName = mDbUri.toString();
             } else {
@@ -431,9 +426,7 @@ public class PasswordActivity extends LockingActivity
 
             BackupManagerCompat backupManager = new BackupManagerCompat(PasswordActivity.this);
             backupManager.dataChanged();
-
         }
-
     }
 
     private class OkClickHandler implements View.OnClickListener
