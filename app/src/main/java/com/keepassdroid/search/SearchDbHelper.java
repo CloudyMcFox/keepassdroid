@@ -113,7 +113,7 @@ public class SearchDbHelper
             String str = iter.next();
             if (str != null && str.length() != 0) {
                 String lower = str.toLowerCase(loc);
-                if (lower.contains(qStr)) {
+                if (lower.contains(qStr) && !results.contains(entry)) {
                     results.add(entry);
                     break;
                 }
