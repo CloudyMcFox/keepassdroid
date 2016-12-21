@@ -189,6 +189,10 @@ public abstract class PwEntry implements Cloneable
     {
         return EntrySearchStringIterator.getInstance(this);
     }
+    public EntrySearchStringIterator stringIterator(SearchParameters sp)
+    {
+        return EntrySearchStringIterator.getInstance(this, sp);
+    }
 
     public void touch(boolean modified, boolean touchParents)
     {

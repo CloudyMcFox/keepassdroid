@@ -162,13 +162,13 @@ public class Database
         loaded = true;
     }
 
-    public PwGroup Search(ArrayList<String> strList)
+    public PwGroup Search(ArrayList<String> strList, boolean fIsParseOpen)
     {
         if (searchHelper == null) {
             return null;
         }
 
-        PwGroup group = searchHelper.search(this, strList);
+        PwGroup group = searchHelper.search(this, strList, fIsParseOpen);
 
         return group;
 
@@ -246,5 +246,4 @@ public class Database
             dirty.add(pm.rootGroup);
         }
     }
-
 }

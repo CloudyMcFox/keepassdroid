@@ -46,7 +46,7 @@ public class SearchTest extends AndroidTestCase {
 	public void testSearch() {
 		ArrayList<String> strList = new ArrayList<>();
 		strList.add("Amazon");
-		PwGroup results = mDb.Search(strList);
+		PwGroup results = mDb.Search(strList, false);
 		assertTrue("Search result not found.", results.childEntries.size() > 0);
 		
 	}
@@ -55,7 +55,7 @@ public class SearchTest extends AndroidTestCase {
 		updateOmitSetting(false);
 		ArrayList<String> strList = new ArrayList<>();
 		strList.add("BackupOnly");
-		PwGroup results = mDb.Search(strList);
+		PwGroup results = mDb.Search(strList, false);
 		
 		assertTrue("Search result not found.", results.childEntries.size() > 0);
 	}
@@ -64,7 +64,7 @@ public class SearchTest extends AndroidTestCase {
 		updateOmitSetting(true);
 		ArrayList<String> strList = new ArrayList<>();
 		strList.add("BackupOnly");
-		PwGroup results = mDb.Search(strList);
+		PwGroup results = mDb.Search(strList, false);
 		
 		assertFalse("Search result found, but should not have been.", results.childEntries.size() > 0);
 	}

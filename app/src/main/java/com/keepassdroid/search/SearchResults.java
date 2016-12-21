@@ -64,23 +64,27 @@ public class SearchResults extends GroupBaseActivity
             hasList = extrasBundle.containsKey("queryList");
         }
         ArrayList<String> strList;
+        boolean fIsParseOpen = false;
         if (hasList){
+            // Came from "Parse Open Apps"
+            fIsParseOpen = true;
             strList = extrasBundle.getStringArrayList("queryList");
+
         } else {
             strList = new ArrayList<>();
             strList.add(getSearchStr(getIntent()));
         }
-        performSearch(strList);
+        performSearch(strList, fIsParseOpen);
     }
 
-    private void performSearch(ArrayList<String> query)
+    private void performSearch(ArrayList<String> query, boolean fIsParseOpen)
     {
-        query(query);
+        query(query, fIsParseOpen);
     }
 
-    private void query(ArrayList<String> query)
+    private void query(ArrayList<String> query, boolean fIsParseOpen)
     {
-        mGroup = mDb.Search(query);
+        mGroup = mDb.Search(query, fIsParseOpen);
 
         if (mGroup == null || mGroup.childEntries.size() < 1) {
             setContentView(new GroupEmptyView(this));
