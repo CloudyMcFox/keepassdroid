@@ -76,8 +76,8 @@ public class DeleteEntry extends AndroidTestCase {
 		strList1.add(ENTRY1_NAME);
 		ArrayList<String> strList2 = new ArrayList<>();
 		strList2.add(ENTRY2_NAME);
-		PwGroup results1 = dbHelp.search(db, strList1);
-		PwGroup results2 = dbHelp.search(db, strList2);
+		PwGroup results1 = dbHelp.search(db, strList1, false);
+		PwGroup results2 = dbHelp.search(db, strList2, false);
 		
 		assertEquals("Entry1 was not removed from the search results", 0, results1.childEntries.size());
 		assertEquals("Entry2 was not removed from the search results", 0, results2.childEntries.size());

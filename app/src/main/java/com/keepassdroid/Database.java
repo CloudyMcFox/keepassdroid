@@ -153,10 +153,10 @@ public class Database
         searchHelper = new SearchDbHelper(ctx);
         loaded = true;
     }
-
-    public PwGroup Search(ArrayList<String> strList) {
+    
+    public PwGroup Search(ArrayList<String> strList, boolean fIsParseOpen) {
         if (searchHelper == null) { return null; }
-        return searchHelper.search(this, strList);
+        return searchHelper.search(this, strList, fIsParseOpen);
     }
 
     public void SaveData(Context ctx) throws IOException, PwDbOutputException

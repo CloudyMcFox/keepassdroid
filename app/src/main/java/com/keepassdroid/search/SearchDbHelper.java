@@ -37,9 +37,13 @@ import com.keepassdroid.database.PwDatabase;
 import com.keepassdroid.database.PwDatabaseV3;
 import com.keepassdroid.database.PwDatabaseV4;
 import com.keepassdroid.database.PwEntry;
+import com.keepassdroid.database.PwEntryV3;
+import com.keepassdroid.database.PwEntryV4;
 import com.keepassdroid.database.PwGroup;
 import com.keepassdroid.database.PwGroupV3;
 import com.keepassdroid.database.PwGroupV4;
+import com.keepassdroid.database.SearchParameters;
+import com.keepassdroid.database.SearchParametersV4;
 
 public class SearchDbHelper
 {
@@ -57,7 +61,7 @@ public class SearchDbHelper
 
     }
 
-    public PwGroup search(Database db, ArrayList<String> qStrList)
+    public PwGroup search(Database db, ArrayList<String> qStrList, boolean fIsParseOpen)
     {
         PwDatabase pm = db.pm;
 
@@ -90,7 +94,7 @@ public class SearchDbHelper
                 for (PwEntry entry : top.childEntries) {
                     for (String qStr : qStrList) {
                         qStr = qStr.toLowerCase(loc).trim();
-                        processEntries(entry, group.childEntries, qStr, loc);
+                        processEntries(entry, group.childEntries, qStr, loc, fIsParseOpen);
                     }
                 }
 
@@ -105,10 +109,27 @@ public class SearchDbHelper
         return group;
     }
 
-    public void processEntries(PwEntry entry, List<PwEntry> results, String qStr, Locale loc)
+    public void processEntries(PwEntry entry, List<PwEntry> results, String qStr, Locale loc, boolean fIsParseOpen)
     {
         // Search all strings in the entry
-        Iterator<String> iter = entry.stringIterator();
+        Iterator<String> iter;
+        if (fIsParseOpen) {
+            SearchParameters sp;
+            if (entry instanceof PwEntryV3) {
+                sp = new SearchParameters();
+            } else if (entry instanceof PwEntryV4) {
+                sp = new SearchParametersV4();
+            } else {
+                throw new RuntimeException("This should not be possible");
+            }
+            sp.searchInGroupNames = false;
+            sp.searchInPasswords = false;
+            sp.searchInUserNames = false;
+
+            iter = entry.stringIterator(sp);
+        } else {
+            iter = entry.stringIterator();
+        }
         while (iter.hasNext()) {
             String str = iter.next();
             if (str != null && str.length() != 0) {
