@@ -57,23 +57,17 @@ public class AboutDialog extends Dialog
         });
     }
 
-    private void setVersion()
-    {
-        Context ctx = getContext();
-
-        String version;
-        try {
-            PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
-            version = packageInfo.versionName;
-
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-            version = "";
-        }
-
-        TextView tv = (TextView) findViewById(R.id.version);
-        tv.setText(version);
-
-    }
-
+	private void setVersion() {
+		Context ctx = getContext();
+		String version;
+		try {
+			PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+			version = packageInfo.versionName;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+			version = "";
+		}
+		TextView tv = (TextView) findViewById(R.id.version);
+		tv.setText(version);
+	}
 }

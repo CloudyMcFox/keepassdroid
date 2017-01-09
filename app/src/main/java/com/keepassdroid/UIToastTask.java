@@ -22,29 +22,22 @@ package com.keepassdroid;
 import android.content.Context;
 import android.widget.Toast;
 
-public class UIToastTask implements Runnable
-{
+public class UIToastTask implements Runnable {
 
-    private String mText;
-    private Context mCtx;
+	private String mText;
+	private Context mCtx;
+	
+	public UIToastTask(Context ctx, int resId) {
+		mCtx = ctx;
+		mText = ctx.getString(resId);
+	}
 
-    public UIToastTask(Context ctx, int resId)
-    {
-        mCtx = ctx;
-        mText = ctx.getString(resId);
-    }
+	public UIToastTask(Context ctx, String text) {
+		mCtx = ctx;
+		mText = text;
+	}
 
-    public UIToastTask(Context ctx, String text)
-    {
-        mCtx = ctx;
-        mText = text;
-    }
-
-    public void run()
-    {
-        Toast.makeText(mCtx, mText, Toast.LENGTH_LONG).show();
-
-    }
-
-
+	public void run() {
+		Toast.makeText(mCtx, mText, Toast.LENGTH_LONG).show();
+	}
 }
