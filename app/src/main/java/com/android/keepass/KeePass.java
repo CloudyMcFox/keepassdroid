@@ -32,6 +32,7 @@ public class KeePass extends Activity
 	public static final int EXIT_LOCK = 1;
 	public static final int EXIT_REFRESH = 2;
 	public static final int EXIT_REFRESH_TITLE = 3;
+
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,7 @@ public class KeePass extends Activity
 	}
 
 
-    private void startFileSelect()
-    {
+    private void startFileSelect() {
         Intent intent = new Intent(this, FileSelectActivity.class);
         startActivityForResult(intent, 0);
     }

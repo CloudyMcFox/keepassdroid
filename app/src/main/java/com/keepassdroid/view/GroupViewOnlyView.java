@@ -56,6 +56,5 @@ public class GroupViewOnlyView extends RelativeLayout {
         View list = findViewById(R.id.group_list);
         LayoutParams lp = (RelativeLayout.LayoutParams) list.getLayoutParams();
         lp.addRule(ALIGN_PARENT_BOTTOM, TRUE);
-
     }
 }

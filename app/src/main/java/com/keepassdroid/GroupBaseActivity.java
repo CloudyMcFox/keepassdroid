@@ -61,10 +61,9 @@ import com.keepassdroid.view.ClickView;
 import com.keepassdroid.view.GroupViewOnlyView;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public abstract class GroupBaseActivity extends LockCloseListActivity
-{
+
+public abstract class GroupBaseActivity extends LockCloseListActivity {
     protected ListView mList;
     protected ListAdapter mAdapter;
     public static final String KEY_ENTRY = "entry";
@@ -168,12 +167,14 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
     private void ensureCorrectListView(){
         mList = (ListView)findViewById(R.id.group_list);
         mList.setOnItemClickListener(
-            new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-                {
-                    onListItemClick((ListView)parent, v, position, id);
-                }
-            });
+
+                        new AdapterView.OnItemClickListener() {
+                            public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+                            {
+                                onListItemClick((ListView)parent, v, position, id);
+                            }
+                        }
+        );
     }
 
     @Override
@@ -389,3 +390,4 @@ public abstract class GroupBaseActivity extends LockCloseListActivity
         }
     }
 }
+

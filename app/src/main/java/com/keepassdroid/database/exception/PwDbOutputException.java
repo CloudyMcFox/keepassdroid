@@ -24,11 +24,11 @@ public class PwDbOutputException extends Exception {
         super(string);
     }
 
-    public PwDbOutputException(String string, Exception e) { super(string, e); }
+	public PwDbOutputException(String string, Exception e) { super(string, e); }
 
-    public PwDbOutputException(Exception e) {
-        super(e);
-    }
+	public PwDbOutputException(Exception e) {
+		super(e);
+	}
 
     /**
      *
