@@ -2,17 +2,15 @@ apply plugin: 'com.android.model.application'
 
 model {
     android {
-        compileSdkVersion = 23
+        compileSdkVersion = 22
         buildToolsVersion = "23.0.3"
 
         defaultConfig.with {
             applicationId = "com.android.keepass"
-            minSdkVersion.apiLevel = 23
-            targetSdkVersion.apiLevel = 23
+            minSdkVersion.apiLevel = 3
+            targetSdkVersion.apiLevel = 12
             versionCode = 154
             versionName = "2.0.6.4"
-            multiDexEnabled = true
-
             testApplicationId = "com.keepassdroid.tests"
             testInstrumentationRunner = "android.test.InstrumentationTestRunner"
 
@@ -61,7 +59,7 @@ model {
     }
 
     android.ndk {
-        moduleName = "libfinal-key"
+        moduleName = "final-key"
 
         ldLibs.add("log")
         CFlags.add("-I${file("src/main/jni/aes")}".toString())
@@ -74,7 +72,4 @@ dependencies {
     androidTestCompile files('libs/junit4.jar')
     // Set this dependency if you want to use Hamcrest matching
     //androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
-
-    compile 'com.madgag.spongycastle:core:1.54.0.0'
-    compile 'com.madgag.spongycastle:prov:1.54.0.0'
 }

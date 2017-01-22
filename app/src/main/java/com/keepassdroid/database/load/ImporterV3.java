@@ -92,349 +92,346 @@ import com.keepassdroid.utils.Types;
  * @author Naomaru Itoi <nao@phoneid.org>
  * @author Bill Zwicky <wrzwicky@pobox.com>
  */
-public class ImporterV3 extends Importer
-{
+public class ImporterV3 extends Importer {
 
-    public ImporterV3()
-    {
-        super();
-    }
+	public ImporterV3() {
+		super();
+	}
 
-    protected PwDatabaseV3 createDB()
-    {
-        return new PwDatabaseV3();
-    }
+	protected PwDatabaseV3 createDB() {
+		return new PwDatabaseV3();
+	}
 
-    /**
-     * Load a v3 database file, return contents in a new PwDatabaseV3.
-     *
-     * @param inStream Existing file to load.
-     * @param password Pass phrase for infile.
-     * @return new PwDatabaseV3 container.
-     * @throws IOException                        on any file error.
-     * @throws InvalidKeyFileException
-     * @throws InvalidPasswordException
-     * @throws InvalidPasswordException           on a decryption error, or possible internal bug.
-     * @throws InvalidDBSignatureException
-     * @throws InvalidDBVersionException
-     * @throws IllegalBlockSizeException          on a decryption error, or possible internal bug.
-     * @throws BadPaddingException                on a decryption error, or possible internal bug.
-     * @throws NoSuchAlgorithmException           on a decryption error, or possible internal bug.
-     * @throws NoSuchPaddingException             on a decryption error, or possible internal bug.
-     * @throws InvalidAlgorithmParameterException if error decrypting main file body.
-     * @throws ShortBufferException               if error decrypting main file body.
-     */
-    public PwDatabaseV3 openDatabase(InputStream inStream, String password, InputStream kfIs)
-            throws IOException, InvalidDBException
-    {
-        return openDatabase(inStream, password, kfIs, new UpdateStatus());
-    }
+	/**
+	 * Load a v3 database file, return contents in a new PwDatabaseV3.
+	 * 
+	 * @param inStream  Existing file to load.
+	 * @param password Pass phrase for infile.
+	 * @return new PwDatabaseV3 container.
+	 * 
+	 * @throws IOException on any file error.
+	 * @throws InvalidKeyFileException 
+	 * @throws InvalidPasswordException 
+	 * @throws InvalidPasswordException on a decryption error, or possible internal bug.
+	 * @throws InvalidDBSignatureException 
+	 * @throws InvalidDBVersionException 
+	 * @throws IllegalBlockSizeException on a decryption error, or possible internal bug.
+	 * @throws BadPaddingException on a decryption error, or possible internal bug.
+	 * @throws NoSuchAlgorithmException on a decryption error, or possible internal bug.
+	 * @throws NoSuchPaddingException on a decryption error, or possible internal bug.
+	 * @throws InvalidAlgorithmParameterException if error decrypting main file body. 
+	 * @throws ShortBufferException if error decrypting main file body.
+	 */
+	public PwDatabaseV3 openDatabase( InputStream inStream, String password, InputStream kfIs)
+	throws IOException, InvalidDBException
+	{
+		return openDatabase(inStream, password, kfIs, new UpdateStatus());
+	}
 
-    public PwDatabaseV3 openDatabase(InputStream inStream, String password, InputStream kfIs, UpdateStatus status)
-            throws IOException, InvalidDBException
-    {
-        PwDatabaseV3 newManager;
+	public PwDatabaseV3 openDatabase( InputStream inStream, String password, InputStream kfIs, UpdateStatus status )
+	throws IOException, InvalidDBException
+	{
+		PwDatabaseV3        newManager;
 
 
-        // Load entire file, most of it's encrypted.
-        int fileSize = inStream.available();
-        byte[] filebuf = new byte[fileSize + 16]; // Pad with a blocksize (Twofish uses 128 bits), since Android 4.3 tries to write more to the buffer
-        inStream.read(filebuf, 0, fileSize);
-        inStream.close();
+		// Load entire file, most of it's encrypted.
+		int fileSize = inStream.available();
+		byte[] filebuf = new byte[fileSize + 16]; // Pad with a blocksize (Twofish uses 128 bits), since Android 4.3 tries to write more to the buffer
+		inStream.read(filebuf, 0, fileSize);
+		inStream.close();
 
-        // Parse header (unencrypted)
-        if (fileSize < PwDbHeaderV3.BUF_SIZE)
-            throw new IOException("File too short for header");
-        PwDbHeaderV3 hdr = new PwDbHeaderV3();
-        hdr.loadFromFile(filebuf, 0);
+		// Parse header (unencrypted)
+		if( fileSize < PwDbHeaderV3.BUF_SIZE )
+			throw new IOException( "File too short for header" );
+		PwDbHeaderV3 hdr = new PwDbHeaderV3();
+		hdr.loadFromFile(filebuf, 0 );
 
-        if ((hdr.signature1 != PwDbHeader.PWM_DBSIG_1) || (hdr.signature2 != PwDbHeaderV3.DBSIG_2)) {
-            throw new InvalidDBSignatureException();
-        }
+		if( (hdr.signature1 != PwDbHeader.PWM_DBSIG_1) || (hdr.signature2 != PwDbHeaderV3.DBSIG_2) ) {
+			throw new InvalidDBSignatureException();
+		}
 
-        if (!hdr.matchesVersion()) {
-            throw new InvalidDBVersionException();
-        }
+		if( !hdr.matchesVersion() ) {
+			throw new InvalidDBVersionException();
+		}
 
-        status.updateMessage(R.string.creating_db_key);
-        newManager = createDB();
-        newManager.setMasterKey(password, kfIs);
+		status.updateMessage(R.string.creating_db_key);
+		newManager = createDB();
+		newManager.setMasterKey(password, kfIs);
 
-        // Select algorithm
-        if ((hdr.flags & PwDbHeaderV3.FLAG_RIJNDAEL) != 0) {
-            newManager.algorithm = PwEncryptionAlgorithm.Rjindal;
-        } else if ((hdr.flags & PwDbHeaderV3.FLAG_TWOFISH) != 0) {
-            newManager.algorithm = PwEncryptionAlgorithm.Twofish;
-        } else {
-            throw new InvalidAlgorithmException();
-        }
+		// Select algorithm
+		if( (hdr.flags & PwDbHeaderV3.FLAG_RIJNDAEL) != 0 ) {
+			newManager.algorithm = PwEncryptionAlgorithm.Rjindal;
+		} else if( (hdr.flags & PwDbHeaderV3.FLAG_TWOFISH) != 0 ) {
+			newManager.algorithm = PwEncryptionAlgorithm.Twofish;
+		} else {
+			throw new InvalidAlgorithmException();
+		}
 
-        // Copy for testing
-        newManager.copyHeader(hdr);
+		// Copy for testing
+		newManager.copyHeader(hdr);
+		
+		newManager.numKeyEncRounds = hdr.numKeyEncRounds;
 
-        newManager.numKeyEncRounds = hdr.numKeyEncRounds;
+		newManager.name = "KeePass Password Manager";
 
-        newManager.name = "KeePass Password Manager";
+		// Generate transformedMasterKey from masterKey
+		newManager.makeFinalKey(hdr.masterSeed, hdr.transformSeed, newManager.numKeyEncRounds);
 
-        // Generate transformedMasterKey from masterKey
-        newManager.makeFinalKey(hdr.masterSeed, hdr.transformSeed, newManager.numKeyEncRounds);
+		status.updateMessage(R.string.decrypting_db);
+		// Initialize Rijndael algorithm
+		Cipher cipher;
+		try {
+			if ( newManager.algorithm == PwEncryptionAlgorithm.Rjindal ) {
+				cipher = CipherFactory.getInstance("AES/CBC/PKCS5Padding");
+			} else if ( newManager.algorithm == PwEncryptionAlgorithm.Twofish ) {
+				cipher = CipherFactory.getInstance("Twofish/CBC/PKCS7PADDING");
+			} else {
+				throw new IOException( "Encryption algorithm is not supported" );
+			}
 
-        status.updateMessage(R.string.decrypting_db);
-        // Initialize Rijndael algorithm
-        Cipher cipher;
-        try {
-            if (newManager.algorithm == PwEncryptionAlgorithm.Rjindal) {
-                cipher = CipherFactory.getInstance("AES/CBC/PKCS5Padding");
-            } else if (newManager.algorithm == PwEncryptionAlgorithm.Twofish) {
-                cipher = CipherFactory.getInstance("TWOFISH/CBC/PKCS7PADDING");
-            } else {
-                throw new IOException("Encryption algorithm is not supported");
-            }
+		} catch (NoSuchAlgorithmException e1) {
+			throw new IOException("No such algorithm");
+		} catch (NoSuchPaddingException e1) {
+			throw new IOException("No such pdading");
+		}
 
-        } catch (NoSuchAlgorithmException e1) {
-            throw new IOException("No such algorithm");
-        } catch (NoSuchPaddingException e1) {
-            throw new IOException("No such pdading");
-        }
+		try {
+			cipher.init( Cipher.DECRYPT_MODE, new SecretKeySpec( newManager.finalKey, "AES" ), new IvParameterSpec( hdr.encryptionIV ) );
+		} catch (InvalidKeyException e1) {
+			throw new IOException("Invalid key");
+		} catch (InvalidAlgorithmParameterException e1) {
+			throw new IOException("Invalid algorithm parameter.");
+		}
 
-        try {
-            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(newManager.finalKey, "AES"), new IvParameterSpec(hdr.encryptionIV));
-        } catch (InvalidKeyException e1) {
-            throw new IOException("Invalid key");
-        } catch (InvalidAlgorithmParameterException e1) {
-            throw new IOException("Invalid algorithm parameter.");
-        }
+		// Decrypt! The first bytes aren't encrypted (that's the header)
+		int encryptedPartSize;
+		try {
+			encryptedPartSize = cipher.doFinal(filebuf, PwDbHeaderV3.BUF_SIZE, fileSize - PwDbHeaderV3.BUF_SIZE, filebuf, PwDbHeaderV3.BUF_SIZE );
+		} catch (ShortBufferException e1) {
+			throw new IOException("Buffer too short");
+		} catch (IllegalBlockSizeException e1) {
+			throw new IOException("Invalid block size");
+		} catch (BadPaddingException e1) {
+			throw new InvalidPasswordException();
+		}
 
-        // Decrypt! The first bytes aren't encrypted (that's the header)
-        int encryptedPartSize;
-        try {
-            encryptedPartSize = cipher.doFinal(filebuf, PwDbHeaderV3.BUF_SIZE, fileSize - PwDbHeaderV3.BUF_SIZE, filebuf, PwDbHeaderV3.BUF_SIZE);
-        } catch (ShortBufferException e1) {
-            throw new IOException("Buffer too short");
-        } catch (IllegalBlockSizeException e1) {
-            throw new IOException("Invalid block size");
-        } catch (BadPaddingException e1) {
-            throw new InvalidPasswordException();
-        }
+		// Copy decrypted data for testing
+		newManager.copyEncrypted(filebuf, PwDbHeaderV3.BUF_SIZE, encryptedPartSize);
 
-        // Copy decrypted data for testing
-        newManager.copyEncrypted(filebuf, PwDbHeaderV3.BUF_SIZE, encryptedPartSize);
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IOException("No SHA-256 algorithm");
+		}
+		NullOutputStream nos = new NullOutputStream();
+		DigestOutputStream dos = new DigestOutputStream(nos, md);
+		dos.write(filebuf, PwDbHeaderV3.BUF_SIZE, encryptedPartSize);
+		dos.close();
+		byte[] hash = md.digest();
+		
+		if( ! Arrays.equals(hash, hdr.contentsHash) ) {
 
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("No SHA-256 algorithm");
-        }
-        NullOutputStream nos = new NullOutputStream();
-        DigestOutputStream dos = new DigestOutputStream(nos, md);
-        dos.write(filebuf, PwDbHeaderV3.BUF_SIZE, encryptedPartSize);
-        dos.close();
-        byte[] hash = md.digest();
+			Log.w("KeePassDroid","Database file did not decrypt correctly. (checksum code is broken)");
+			throw new InvalidPasswordException();
+		}
 
-        if (!Arrays.equals(hash, hdr.contentsHash)) {
+		// Import all groups
 
-            Log.w("KeePassDroid", "Database file did not decrypt correctly. (checksum code is broken)");
-            throw new InvalidPasswordException();
-        }
+		int pos = PwDbHeaderV3.BUF_SIZE;
+		PwGroupV3 newGrp = new PwGroupV3();
+		for( int i = 0; i < hdr.numGroups; ) {
+			int fieldType = LEDataInputStream.readUShort( filebuf, pos );
+			pos += 2;
+			int fieldSize = LEDataInputStream.readInt( filebuf, pos );
+			pos += 4;
 
-        // Import all groups
+			if( fieldType == 0xFFFF ) {
 
-        int pos = PwDbHeaderV3.BUF_SIZE;
-        PwGroupV3 newGrp = new PwGroupV3();
-        for (int i = 0; i < hdr.numGroups; ) {
-            int fieldType = LEDataInputStream.readUShort(filebuf, pos);
-            pos += 2;
-            int fieldSize = LEDataInputStream.readInt(filebuf, pos);
-            pos += 4;
+				// End-Group record.  Save group and count it.
+				newGrp.populateBlankFields(newManager);
+				newManager.groups.add(newGrp);
+				newGrp = new PwGroupV3();
+				i++;
+			}
+			else {
+				readGroupField(newManager, newGrp, fieldType, filebuf, pos);
+			}
+			pos += fieldSize;
+		}
 
-            if (fieldType == 0xFFFF) {
+		// Import all entries
+		PwEntryV3 newEnt = new PwEntryV3();
+		for( int i = 0; i < hdr.numEntries; ) {
+			int fieldType = LEDataInputStream.readUShort( filebuf, pos );
+			int fieldSize = LEDataInputStream.readInt( filebuf, pos + 2 );
 
-                // End-Group record.  Save group and count it.
-                newGrp.populateBlankFields(newManager);
-                newManager.groups.add(newGrp);
-                newGrp = new PwGroupV3();
-                i++;
-            } else {
-                readGroupField(newManager, newGrp, fieldType, filebuf, pos);
-            }
-            pos += fieldSize;
-        }
+			if( fieldType == 0xFFFF ) {
+				// End-Group record.  Save group and count it.
+				newEnt.populateBlankFields(newManager);
+				newManager.entries.add(newEnt);
+				newEnt = new PwEntryV3();
+				i++;
+			}
+			else {
+				readEntryField(newManager, newEnt, filebuf, pos);
+			}
+			pos += 2 + 4 + fieldSize;
+		}
 
-        // Import all entries
-        PwEntryV3 newEnt = new PwEntryV3();
-        for (int i = 0; i < hdr.numEntries; ) {
-            int fieldType = LEDataInputStream.readUShort(filebuf, pos);
-            int fieldSize = LEDataInputStream.readInt(filebuf, pos + 2);
+		newManager.constructTree(null);
+		
+		return newManager;
+	}
 
-            if (fieldType == 0xFFFF) {
-                // End-Group record.  Save group and count it.
-                newEnt.populateBlankFields(newManager);
-                newManager.entries.add(newEnt);
-                newEnt = new PwEntryV3();
-                i++;
-            } else {
-                readEntryField(newManager, newEnt, filebuf, pos);
-            }
-            pos += 2 + 4 + fieldSize;
-        }
+	/**
+	 * KeePass's custom pad style.
+	 * 
+	 * @param data buffer to pad.
+	 * @return addtional bytes to append to data[] to make
+	 *    a properly padded array.
+	 */
+	public static byte[] makePad( byte[] data ) {
+		//custom pad method
 
-        newManager.constructTree(null);
+		// append 0x80 plus zeros to a multiple of 4 bytes
+		int thisblk = 32 - data.length % 32;  // bytes needed to finish blk
+		int nextblk = 0;                      // 32 if we need another block
+		// need 9 bytes; add new block if no room
+		if( thisblk < 9 ) {
+			nextblk = 32;
+		}
 
-        return newManager;
-    }
+		// all bytes are zeroed for free
+		byte[] pad = new byte[ thisblk + nextblk ];
+		pad[0] = (byte)0x80;
 
-    /**
-     * KeePass's custom pad style.
-     *
-     * @param data buffer to pad.
-     * @return addtional bytes to append to data[] to make
-     * a properly padded array.
-     */
-    public static byte[] makePad(byte[] data)
-    {
-        //custom pad method
+		// write length*8 to end of final block
+		int ix = thisblk + nextblk - 8;
+		LEDataOutputStream.writeInt( data.length>>29, pad, ix );
+		bsw32( pad, ix );
+		ix += 4;
+		LEDataOutputStream.writeInt( data.length<<3, pad, ix );
+		bsw32( pad, ix );
 
-        // append 0x80 plus zeros to a multiple of 4 bytes
-        int thisblk = 32 - data.length % 32;  // bytes needed to finish blk
-        int nextblk = 0;                      // 32 if we need another block
-        // need 9 bytes; add new block if no room
-        if (thisblk < 9) {
-            nextblk = 32;
-        }
+		return pad;
+	}
 
-        // all bytes are zeroed for free
-        byte[] pad = new byte[thisblk + nextblk];
-        pad[0] = (byte) 0x80;
-
-        // write length*8 to end of final block
-        int ix = thisblk + nextblk - 8;
-        LEDataOutputStream.writeInt(data.length >> 29, pad, ix);
-        bsw32(pad, ix);
-        ix += 4;
-        LEDataOutputStream.writeInt(data.length << 3, pad, ix);
-        bsw32(pad, ix);
-
-        return pad;
-    }
-
-    public static void bsw32(byte[] ary, int offset)
-    {
-        byte t = ary[offset];
-        ary[offset] = ary[offset + 3];
-        ary[offset + 3] = t;
-        t = ary[offset + 1];
-        ary[offset + 1] = ary[offset + 2];
-        ary[offset + 2] = t;
-    }
-
-
-    /**
-     * Parse and save one record from binary file.
-     *
-     * @param buf
-     * @param offset
-     * @return If >0,
-     * @throws UnsupportedEncodingException
-     */
-    void readGroupField(PwDatabaseV3 db, PwGroupV3 grp, int fieldType, byte[] buf, int offset) throws UnsupportedEncodingException
-    {
-        switch (fieldType) {
-            case 0x0000:
-                // Ignore field
-                break;
-            case 0x0001:
-                grp.groupId = LEDataInputStream.readInt(buf, offset);
-                break;
-            case 0x0002:
-                grp.name = Types.readCString(buf, offset);
-                break;
-            case 0x0003:
-                grp.tCreation = new PwDate(buf, offset);
-                break;
-            case 0x0004:
-                grp.tLastMod = new PwDate(buf, offset);
-                break;
-            case 0x0005:
-                grp.tLastAccess = new PwDate(buf, offset);
-                break;
-            case 0x0006:
-                grp.tExpire = new PwDate(buf, offset);
-                break;
-            case 0x0007:
-                grp.icon = db.iconFactory.getIcon(LEDataInputStream.readInt(buf, offset));
-                break;
-            case 0x0008:
-                grp.level = LEDataInputStream.readUShort(buf, offset);
-                break;
-            case 0x0009:
-                grp.flags = LEDataInputStream.readInt(buf, offset);
-                break;
-        }
-    }
+	public static void bsw32( byte[] ary, int offset ) {
+		byte t = ary[offset];
+		ary[offset] = ary[offset+3];
+		ary[offset+3] = t;
+		t = ary[offset+1];
+		ary[offset+1] = ary[offset+2];
+		ary[offset+2] = t;
+	}
 
 
-    void readEntryField(PwDatabaseV3 db, PwEntryV3 ent, byte[] buf, int offset)
-            throws UnsupportedEncodingException
-    {
-        int fieldType = LEDataInputStream.readUShort(buf, offset);
-        offset += 2;
-        int fieldSize = LEDataInputStream.readInt(buf, offset);
-        offset += 4;
+	/**
+	 * Parse and save one record from binary file.
+	 * @param buf
+	 * @param offset
+	 * @return If >0, 
+	 * @throws UnsupportedEncodingException 
+	 */
+	void readGroupField(PwDatabaseV3 db, PwGroupV3 grp, int fieldType, byte[] buf, int offset) throws UnsupportedEncodingException {
+		switch( fieldType ) {
+		case 0x0000 :
+			// Ignore field
+			break;
+		case 0x0001 :
+			grp.groupId = LEDataInputStream.readInt(buf, offset);
+			break;
+		case 0x0002 :
+			grp.name = Types.readCString(buf, offset);
+			break;
+		case 0x0003 :
+			grp.tCreation = new PwDate(buf, offset);
+			break;
+		case 0x0004 :
+			grp.tLastMod = new PwDate(buf, offset);
+			break;
+		case 0x0005 :
+			grp.tLastAccess = new PwDate(buf, offset);
+			break;
+		case 0x0006 :
+			grp.tExpire = new PwDate(buf, offset);
+			break;
+		case 0x0007 :
+			grp.icon = db.iconFactory.getIcon(LEDataInputStream.readInt(buf, offset));
+			break;
+		case 0x0008 :
+			grp.level = LEDataInputStream.readUShort(buf, offset);
+			break;
+		case 0x0009 :
+			grp.flags = LEDataInputStream.readInt(buf, offset);
+			break;
+		}
+	}
 
-        switch (fieldType) {
-            case 0x0000:
-                // Ignore field
-                break;
-            case 0x0001:
-                ent.setUUID(Types.bytestoUUID(buf, offset));
-                break;
-            case 0x0002:
-                ent.groupId = LEDataInputStream.readInt(buf, offset);
-                break;
-            case 0x0003:
-                int iconId = LEDataInputStream.readInt(buf, offset);
 
-                // Clean up after bug that set icon ids to -1
-                if (iconId == -1) {
-                    iconId = 0;
-                }
 
-                ent.icon = db.iconFactory.getIcon(iconId);
-                break;
-            case 0x0004:
-                ent.title = Types.readCString(buf, offset);
-                break;
-            case 0x0005:
-                ent.url = Types.readCString(buf, offset);
-                break;
-            case 0x0006:
-                ent.username = Types.readCString(buf, offset);
-                break;
-            case 0x0007:
-                ent.setPassword(buf, offset, Types.strlen(buf, offset));
-                break;
-            case 0x0008:
-                ent.additional = Types.readCString(buf, offset);
-                break;
-            case 0x0009:
-                ent.tCreation = new PwDate(buf, offset);
-                break;
-            case 0x000A:
-                ent.tLastMod = new PwDate(buf, offset);
-                break;
-            case 0x000B:
-                ent.tLastAccess = new PwDate(buf, offset);
-                break;
-            case 0x000C:
-                ent.tExpire = new PwDate(buf, offset);
-                break;
-            case 0x000D:
-                ent.binaryDesc = Types.readCString(buf, offset);
-                break;
-            case 0x000E:
-                ent.setBinaryData(buf, offset, fieldSize);
-                break;
-        }
-    }
+	void readEntryField(PwDatabaseV3 db, PwEntryV3 ent, byte[] buf, int offset)
+	throws UnsupportedEncodingException
+	{
+		int fieldType = LEDataInputStream.readUShort(buf, offset);
+		offset += 2;
+		int fieldSize = LEDataInputStream.readInt(buf, offset);
+		offset += 4;
+
+		switch( fieldType ) {
+		case 0x0000 :
+			// Ignore field
+			break;
+		case 0x0001 :
+			ent.setUUID(Types.bytestoUUID(buf, offset));
+			break;
+		case 0x0002 :
+			ent.groupId = LEDataInputStream.readInt(buf, offset);
+			break;
+		case 0x0003 :
+			int iconId = LEDataInputStream.readInt(buf, offset);
+			
+			// Clean up after bug that set icon ids to -1
+			if (iconId == -1) {
+				iconId = 0;
+			}
+			
+			ent.icon = db.iconFactory.getIcon(iconId);
+			break;
+		case 0x0004 :
+			ent.title = Types.readCString(buf, offset); 
+			break;
+		case 0x0005 :
+			ent.url = Types.readCString(buf, offset);
+			break;
+		case 0x0006 :
+			ent.username = Types.readCString(buf, offset);
+			break;
+		case 0x0007 :
+			ent.setPassword(buf, offset, Types.strlen(buf, offset));
+			break;
+		case 0x0008 :
+			ent.additional = Types.readCString(buf, offset);
+			break;
+		case 0x0009 :
+			ent.tCreation = new PwDate(buf, offset);
+			break;
+		case 0x000A :
+			ent.tLastMod = new PwDate(buf, offset);
+			break;
+		case 0x000B :
+			ent.tLastAccess = new PwDate(buf, offset);
+			break;
+		case 0x000C :
+			ent.tExpire = new PwDate(buf, offset);
+			break;
+		case 0x000D :
+			ent.binaryDesc = Types.readCString(buf, offset);
+			break;
+		case 0x000E :
+			ent.setBinaryData(buf, offset, fieldSize);
+			break;
+		}
+	}
 }

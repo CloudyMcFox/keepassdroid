@@ -37,43 +37,17 @@ public class AboutDialog extends Dialog
     {
         super(context);
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.about);
-        setTitle(R.string.app_name);
-
-        setVersion();
-
-        Button okButton = (Button) findViewById(R.id.about_button);
-        okButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                dismiss();
-            }
-        });
-    }
-
-    private void setVersion()
-    {
-        Context ctx = getContext();
-
-        String version;
-        try {
-            PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
-            version = packageInfo.versionName;
-
-        } catch (NameNotFoundException e) {
-            e.printStackTrace();
-            version = "";
-        }
-
-        TextView tv = (TextView) findViewById(R.id.version);
-        tv.setText(version);
-
-    }
-
+	private void setVersion() {
+		Context ctx = getContext();
+		String version;
+		try {
+			PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
+			version = packageInfo.versionName;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+			version = "";
+		}
+		TextView tv = (TextView) findViewById(R.id.version);
+		tv.setText(version);
+	}
 }

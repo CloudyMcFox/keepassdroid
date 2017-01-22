@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 Brian Pellin.
+ * Copyright 2009-2016 Brian Pellin.
  *     
  * This file is part of KeePassDroid.
  *
@@ -19,15 +19,14 @@
  */
 package com.keepassdroid.database.exception;
 
-public class PwDbOutputException extends Exception
-{
-    public PwDbOutputException(String string)
-    {
+public class PwDbOutputException extends Exception {
+    public PwDbOutputException(String string) {
         super(string);
     }
 
-    public PwDbOutputException(Exception e)
-    {
+    public PwDbOutputException(String string, Exception e) { super(string, e); }
+
+    public PwDbOutputException(Exception e) {
         super(e);
     }
 
