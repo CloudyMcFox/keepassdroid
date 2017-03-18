@@ -428,23 +428,27 @@ public class EntryActivity extends LockCloseHideActivity
 
     private void timeoutCopyToClipboard(String text)
     {
+        timeoutCopyToClipboard(text, this);
+    }
+    public void timeoutCopyToClipboard(String text, Context ctx)
+    {
         try {
-            Util.copyToClipboard(this, text);
+            Util.copyToClipboard(ctx, text);
         } catch (SamsungClipboardException e) {
             showSamsungDialog();
             return;
         }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String sClipClear = prefs.getString(getString(R.string.clipboard_timeout_key), getString(R.string.clipboard_timeout_default));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String sClipClear = prefs.getString(ctx.getString(R.string.clipboard_timeout_key), ctx.getString(R.string.clipboard_timeout_default));
 
         long clipClearTime = Long.parseLong(sClipClear);
 
         if (clipClearTime > 0) {
-            mTimer.schedule(new ClearClipboardTask(this, text), clipClearTime);
+            mTimer.schedule(new ClearClipboardTask(ctx, text), clipClearTime);
         }
+        Toast.makeText(ctx, R.string.password_copied, Toast.LENGTH_LONG).show();
     }
-
 
     // Setup to allow the toast to happen in the foreground
     final Handler uiThreadCallback = new Handler();

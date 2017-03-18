@@ -94,13 +94,21 @@ public class PwEntryView extends ClickView
 
     public void onClick()
     {
-        launchEntry();
+        copyEntryPassword();
     }
 
     private void launchEntry()
     {
         EntryActivity.Launch(mAct, mPw, mPos);
+    }
 
+    private void copyEntryPassword()
+    {
+        mPw.getPassword();
+        String password = new String(mPw.getPassword());
+        if (password.length() > 0) {
+            new EntryActivity().timeoutCopyToClipboard(password, mAct);
+        }
     }
 
     private void deleteEntry()

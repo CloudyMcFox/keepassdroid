@@ -159,6 +159,7 @@
     <string name="open_apps">Find Open Apps</string>
     <string name="pass_filename">KeePass database filename:</string>
     <string name="password_title">Enter database password</string>
+    <string name="password_copied">Password Copied</string>
     <string name="progress_create">Creating new database&#8230;</string>
     <string name="progress_title">Working&#8230;</string>
     <string name="protection">Protection</string>
