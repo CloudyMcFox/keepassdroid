@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.spongycastle.crypto.engines.AESEngine;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,24 +43,28 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import android.webkit.URLUtil;
-
 import biz.source_code.base64Coder.Base64Coder;
 
 import com.keepassdroid.crypto.CipherFactory;
+import com.keepassdroid.crypto.CryptoUtil;
+import com.keepassdroid.crypto.PwStreamCipherFactory;
+import com.keepassdroid.crypto.engine.AesEngine;
+import com.keepassdroid.crypto.engine.CipherEngine;
 import com.keepassdroid.database.exception.InvalidKeyFileException;
 import com.keepassdroid.utils.EmptyUtils;
 
 
-public class PwDatabaseV4 extends PwDatabase
-{
+public class PwDatabaseV4 extends PwDatabase {
 
     public static final Date DEFAULT_NOW = new Date();
-    public static final UUID UUID_ZERO = new UUID(0, 0);
+    public static final UUID UUID_ZERO = new UUID(0,0);
     private static final int DEFAULT_HISTORY_MAX_ITEMS = 10; // -1 unlimited
     private static final long DEFAULT_HISTORY_MAX_SIZE = 6 * 1024 * 1024; // -1 unlimited
     private static final String RECYCLEBIN_NAME = "RecycleBin";
 
-    public UUID dataCipher = CipherFactory.AES_CIPHER;
+    public byte[] hmacKey;
+    public UUID dataCipher = AesEngine.CIPHER_UUID;
+    public CipherEngine dataEngine = new AesEngine();
     public PwCompressionAlgorithm compressionAlgorithm = PwCompressionAlgorithm.Gzip;
     public long numKeyEncRounds = 6000;
     public Date nameChanged = DEFAULT_NOW;
@@ -89,8 +95,7 @@ public class PwDatabaseV4 extends PwDatabase
 
     public String localizedAppName = "KeePassDroid";
 
-    public class MemoryProtectionConfig
-    {
+    public class MemoryProtectionConfig {
         public boolean protectTitle = false;
         public boolean protectUserName = false;
         public boolean protectPassword = false;
@@ -99,13 +104,12 @@ public class PwDatabaseV4 extends PwDatabase
 
         public boolean autoEnableVisualHiding = false;
 
-        public boolean GetProtection(String field)
-        {
-            if (field.equalsIgnoreCase(PwDefsV4.TITLE_FIELD)) return protectTitle;
-            if (field.equalsIgnoreCase(PwDefsV4.USERNAME_FIELD)) return protectUserName;
-            if (field.equalsIgnoreCase(PwDefsV4.PASSWORD_FIELD)) return protectPassword;
-            if (field.equalsIgnoreCase(PwDefsV4.URL_FIELD)) return protectUrl;
-            if (field.equalsIgnoreCase(PwDefsV4.NOTES_FIELD)) return protectNotes;
+        public boolean GetProtection(String field) {
+            if ( field.equalsIgnoreCase(PwDefsV4.TITLE_FIELD)) return protectTitle;
+            if ( field.equalsIgnoreCase(PwDefsV4.USERNAME_FIELD)) return protectUserName;
+            if ( field.equalsIgnoreCase(PwDefsV4.PASSWORD_FIELD)) return protectPassword;
+            if ( field.equalsIgnoreCase(PwDefsV4.URL_FIELD)) return protectUrl;
+            if ( field.equalsIgnoreCase(PwDefsV4.NOTES_FIELD)) return protectNotes;
 
             return false;
         }
@@ -113,20 +117,19 @@ public class PwDatabaseV4 extends PwDatabase
 
     @Override
     public byte[] getMasterKey(String key, InputStream keyInputStream)
-            throws InvalidKeyFileException, IOException
-    {
-        assert (key != null);
+            throws InvalidKeyFileException, IOException {
+        assert(key != null);
 
         byte[] fKey;
 
-        if (key.length() > 0 && keyInputStream != null) {
+        if ( key.length() > 0 && keyInputStream != null) {
             return getCompositeKey(key, keyInputStream);
-        } else if (key.length() > 0) {
-            fKey = getPasswordKey(key);
-        } else if (keyInputStream != null) {
+        } else if ( key.length() > 0 ) {
+            fKey =  getPasswordKey(key);
+        } else if ( keyInputStream != null) {
             fKey = getFileKey(keyInputStream);
         } else {
-            throw new IllegalArgumentException("Key cannot be empty.");
+            throw new IllegalArgumentException( "Key cannot be empty." );
         }
 
         MessageDigest md;
@@ -140,8 +143,30 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    protected String getPasswordEncoding()
-    {
+    public void makeFinalKey(byte[] masterSeed, byte[] masterSeed2, int numRounds) throws IOException {
+
+        byte[] transformedMasterKey = transformMasterKey(masterSeed2, masterKey, numRounds);
+
+
+        byte[] cmpKey = new byte[65];
+        System.arraycopy(masterSeed, 0, cmpKey, 0, 32);
+        System.arraycopy(transformedMasterKey, 0, cmpKey, 32, 32);
+        finalKey = CryptoUtil.resizeKey(cmpKey, 0, 64, dataEngine.keyLength());
+
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-512");
+            cmpKey[64] = 1;
+            hmacKey = md.digest(cmpKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IOException("No SHA-512 implementation");
+        } finally {
+            Arrays.fill(cmpKey, (byte)0);
+        }
+    }
+
+    @Override
+    protected String getPasswordEncoding() {
         return "UTF-8";
     }
 
@@ -152,15 +177,14 @@ public class PwDatabaseV4 extends PwDatabase
     private static final String KeyDataElementName = "Data";
 
     @Override
-    protected byte[] loadXmlKeyFile(InputStream keyInputStream)
-    {
+    protected byte[] loadXmlKeyFile(InputStream keyInputStream) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(keyInputStream);
 
             Element el = doc.getDocumentElement();
-            if (el == null || !el.getNodeName().equalsIgnoreCase(RootElementName)) {
+            if (el == null || ! el.getNodeName().equalsIgnoreCase(RootElementName)) {
                 return null;
             }
 
@@ -169,16 +193,16 @@ public class PwDatabaseV4 extends PwDatabase
                 return null;
             }
 
-            for (int i = 0; i < children.getLength(); i++) {
+            for ( int i = 0; i < children.getLength(); i++ ) {
                 Node child = children.item(i);
 
-                if (child.getNodeName().equalsIgnoreCase(KeyElementName)) {
+                if ( child.getNodeName().equalsIgnoreCase(KeyElementName) ) {
                     NodeList keyChildren = child.getChildNodes();
-                    for (int j = 0; j < keyChildren.getLength(); j++) {
+                    for ( int j = 0; j < keyChildren.getLength(); j++ ) {
                         Node keyChild = keyChildren.item(j);
-                        if (keyChild.getNodeName().equalsIgnoreCase(KeyDataElementName)) {
+                        if ( keyChild.getNodeName().equalsIgnoreCase(KeyDataElementName) ) {
                             NodeList children2 = keyChild.getChildNodes();
-                            for (int k = 0; k < children2.getLength(); k++) {
+                            for ( int k = 0; k < children2.getLength(); k++) {
                                 Node text = children2.item(k);
                                 if (text.getNodeType() == Node.TEXT_NODE) {
                                     Text txt = (Text) text;
@@ -196,8 +220,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public List<PwGroup> getGroups()
-    {
+    public List<PwGroup> getGroups() {
         List<PwGroup> list = new ArrayList<PwGroup>();
         PwGroupV4 root = (PwGroupV4) rootGroup;
         root.buildChildGroupsRecursive(list);
@@ -206,14 +229,12 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public List<PwGroup> getGrpRoots()
-    {
+    public List<PwGroup> getGrpRoots() {
         return rootGroup.childGroups;
     }
 
     @Override
-    public List<PwEntry> getEntries()
-    {
+    public List<PwEntry> getEntries() {
         List<PwEntry> list = new ArrayList<PwEntry>();
         PwGroupV4 root = (PwGroupV4) rootGroup;
         root.buildChildEntriesRecursive(list);
@@ -222,33 +243,28 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public long getNumRounds()
-    {
+    public long getNumRounds() {
         return numKeyEncRounds;
     }
 
     @Override
-    public void setNumRounds(long rounds) throws NumberFormatException
-    {
+    public void setNumRounds(long rounds) throws NumberFormatException {
         numKeyEncRounds = rounds;
 
     }
 
     @Override
-    public boolean appSettingsEnabled()
-    {
+    public boolean appSettingsEnabled() {
         return false;
     }
 
     @Override
-    public PwEncryptionAlgorithm getEncAlgorithm()
-    {
+    public PwEncryptionAlgorithm getEncAlgorithm() {
         return PwEncryptionAlgorithm.Rjindal;
     }
 
     @Override
-    public PwGroupIdV4 newGroupId()
-    {
+    public PwGroupIdV4 newGroupId() {
         PwGroupIdV4 id = new PwGroupIdV4(UUID_ZERO);
 
         while (true) {
@@ -261,14 +277,12 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public PwGroup createGroup()
-    {
+    public PwGroup createGroup() {
         return new PwGroupV4();
     }
 
     @Override
-    public boolean isBackup(PwGroup group)
-    {
+    public boolean isBackup(PwGroup group) {
         if (!recycleBinEnabled) {
             return false;
         }
@@ -277,19 +291,17 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public void populateGlobals(PwGroup currentGroup)
-    {
+    public void populateGlobals(PwGroup currentGroup) {
         groups.put(rootGroup.getId(), rootGroup);
 
         super.populateGlobals(currentGroup);
     }
 
-    /**
-     * Ensure that the recycle bin group exists, if enabled and create it
-     * if it doesn't exist
+    /** Ensure that the recycle bin group exists, if enabled and create it
+     *  if it doesn't exist
+     *
      */
-    private void ensureRecycleBin()
-    {
+    private void ensureRecycleBin() {
         if (getRecycleBin() == null) {
             // Create recycle bin
 
@@ -304,8 +316,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public boolean canRecycle(PwGroup group)
-    {
+    public boolean canRecycle(PwGroup group) {
         if (!recycleBinEnabled) {
             return false;
         }
@@ -316,8 +327,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public boolean canRecycle(PwEntry entry)
-    {
+    public boolean canRecycle(PwEntry entry) {
         if (!recycleBinEnabled) {
             return false;
         }
@@ -327,8 +337,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public void recycle(PwEntry entry)
-    {
+    public void recycle(PwEntry entry) {
         ensureRecycleBin();
 
         PwGroup parent = entry.getParent();
@@ -343,8 +352,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public void undoRecycle(PwEntry entry, PwGroup origParent)
-    {
+    public void undoRecycle(PwEntry entry, PwGroup origParent) {
 
         PwGroup recycleBin = getRecycleBin();
         removeEntryFrom(entry, recycleBin);
@@ -353,24 +361,21 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public void deleteEntry(PwEntry entry)
-    {
+    public void deleteEntry(PwEntry entry) {
         super.deleteEntry(entry);
 
         deletedObjects.add(new PwDeletedObject(entry.getUUID()));
     }
 
     @Override
-    public void undoDeleteEntry(PwEntry entry, PwGroup origParent)
-    {
+    public void undoDeleteEntry(PwEntry entry, PwGroup origParent) {
         super.undoDeleteEntry(entry, origParent);
 
         deletedObjects.remove(entry);
     }
 
     @Override
-    public PwGroupV4 getRecycleBin()
-    {
+    public PwGroupV4 getRecycleBin() {
         if (recycleBinUUID == null) {
             return null;
         }
@@ -380,8 +385,7 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public boolean isGroupSearchable(PwGroup group, boolean omitBackup)
-    {
+    public boolean isGroupSearchable(PwGroup group, boolean omitBackup) {
         if (!super.isGroupSearchable(group, omitBackup)) {
             return false;
         }
@@ -392,22 +396,19 @@ public class PwDatabaseV4 extends PwDatabase
     }
 
     @Override
-    public boolean validatePasswordEncoding(String key)
-    {
+    public boolean validatePasswordEncoding(String key) {
         return true;
     }
 
     @Override
-    public void initNew(String dbPath)
-    {
+    public void initNew(String dbPath) {
         String filename = URLUtil.guessFileName(dbPath, null, null);
 
         rootGroup = new PwGroupV4(true, true, dbNameFromPath(dbPath), iconFactory.getIcon(PwIconStandard.FOLDER));
         groups.put(rootGroup.getId(), rootGroup);
     }
 
-    private String dbNameFromPath(String dbPath)
-    {
+    private String dbNameFromPath(String dbPath) {
         String filename = URLUtil.guessFileName(dbPath, null, null);
 
         if (EmptyUtils.isNullOrEmpty(filename)) {

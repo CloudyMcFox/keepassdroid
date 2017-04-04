@@ -33,8 +33,7 @@ import com.keepassdroid.database.exception.PwDbOutputException;
 import com.keepassdroid.stream.LEDataOutputStream;
 import com.keepassdroid.utils.Types;
 
-public class PwDbHeaderOutputV4 extends PwDbHeaderOutput
-{
+public class PwDbHeaderOutputV4 extends PwDbHeaderOutput {
     private PwDbHeaderV4 header;
     private LEDataOutputStream los;
     private DigestOutputStream dos;
@@ -42,8 +41,7 @@ public class PwDbHeaderOutputV4 extends PwDbHeaderOutput
 
     private static byte[] EndHeaderValue = {'\r', '\n', '\r', '\n'};
 
-    public PwDbHeaderOutputV4(PwDatabaseV4 d, PwDbHeaderV4 h, OutputStream os) throws PwDbOutputException
-    {
+    public PwDbHeaderOutputV4(PwDatabaseV4 d, PwDbHeaderV4 h, OutputStream os) throws PwDbOutputException {
         db = d;
         header = h;
 
@@ -58,11 +56,10 @@ public class PwDbHeaderOutputV4 extends PwDbHeaderOutput
         los = new LEDataOutputStream(dos);
     }
 
-    public void output() throws IOException
-    {
+    public void output() throws IOException {
         los.writeUInt(PwDbHeader.PWM_DBSIG_1);
         los.writeUInt(PwDbHeaderV4.DBSIG_2);
-        los.writeUInt(PwDbHeaderV4.FILE_VERSION_32);
+        los.writeUInt(PwDbHeaderV4.FILE_VERSION_32_3);
 
         writeHeaderField(PwDbHeaderV4Fields.CipherID, Types.UUIDtoBytes(db.dataCipher));
         writeHeaderField(PwDbHeaderV4Fields.CompressionFlags, LEDataOutputStream.writeIntBuf(db.compressionAlgorithm.id));
@@ -79,8 +76,7 @@ public class PwDbHeaderOutputV4 extends PwDbHeaderOutput
         hashOfHeader = dos.getMessageDigest().digest();
     }
 
-    private void writeHeaderField(byte fieldId, byte[] pbData) throws IOException
-    {
+    private void writeHeaderField(byte fieldId, byte[] pbData) throws IOException {
         // Write the field id
         los.write(fieldId);
 
